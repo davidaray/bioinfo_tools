@@ -1,4 +1,4 @@
-#USAGE: RM2bed.sh <filename>
+#USAGE: RM2bed.py -i <input> -m <minsize> -s <sortcriterion> -p <prefix(optional)>
 #Will process a .align.gz or .align file from RepeatMasker to generate multiple sorted output 
 #files in .bed format
 
@@ -12,6 +12,7 @@
 from Bio import SeqIO
 import argparse
 import os
+import re
 
 def get_args():
 	parser = argparse.ArgumentParser(description="Will process a .align or .align.gz file from RepeatMasker to generate multiple sorted output files in .bed format", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -29,6 +30,18 @@ def get_args():
 	return ALIGN, MINSIZE, PREFIX, CRITERION
 ALIGN, MINSIZE, PREFIX, CRITERION = get_args()
 
+
+#Determine file type
+if ALIGN.lower().endswith(.gz):
+	#gunzip statement
+elif ALIGN.lower().endswith(.align):
+	#no action
+else:
+	print('Input file must be either .align.gz or .align.')
+
+#If no prefix, get prefix from filename.
+if PREFIX = ""
+	PREFIX = re.split("[_.]", INPUT)[0] 	
 
 ABBREV=$(basename $1 .align)
 	
