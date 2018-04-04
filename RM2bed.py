@@ -12,8 +12,13 @@
 from Bio import SeqIO
 import argparse
 import os
-import re
+impore re
+import gzip
+import subprocess
+import fileinput
+import pandas as pd
 
+##Get arguments function
 def get_args():
 	parser = argparse.ArgumentParser(description="Will process a .align or .align.gz file from RepeatMasker to generate multiple sorted output files in .bed format", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser.add_argument('-i', '--input', type=str, help='Name of the .align or .align.gz file to be parsed', required=True)
@@ -28,74 +33,74 @@ def get_args():
 	CRITERION = args.sortcriterion
 	
 	return ALIGN, MINSIZE, PREFIX, CRITERION
+
+##use the get_args function
 ALIGN, MINSIZE, PREFIX, CRITERION = get_args()
 
+##If no prefix, get prefix from filename using the first part of the filename.
+if PREFIX = ""
+        PREFIX = re.split("[_.]", INPUT)[0]
 
-#Determine file type
-if ALIGN.lower().endswith(.gz):
-	#gunzip statement
-elif ALIGN.lower().endswith(.align):
-	#no action
+##Determine file type using extension.
+if ALIGN.lower().endswith(gz):
+	TMP = PREFIX + '.tmp.file'
+	IN = gzip.open(ALIGN, 'rb')
+	with open(TMP, 'wb') as OUT:
+		OUT.write(IN.read())
+	IN.close()
+	OUT.close()
+elif ALIGN.lower().endswith(align):
+	TMP = PREFIX + '.tmp.file'
+	IN = open(ALIGN, 'r')
+	with open(TMP, 'wb') as OUT:
+		OUT.write(IN.read())
+	IN.close()
+	OUT.close()
 else:
 	print('Input file must be either .align.gz or .align.')
+	exit()
 
-#If no prefix, get prefix from filename.
-if PREFIX = ""
-	PREFIX = re.split("[_.]", INPUT)[0] 	
+##Call subprocess, calcDivergenceFromAlign.Ray.pl, using perl. Keep the new file for troubleshooting.
+subprocess.check_call('perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl -noCpG {} >{}'.format(TMP, PREFIX + '_div.out'), shell=True)
 
-ABBREV=$(basename $1 .align)
-	
-#gunzip $ABBREV".align"
+##Call subprocess, RM.addsize.div.pl, to add size column	
+subprocess.check_call('perl /lustre/work/daray/software/RM.addsize.div.pl {}'.format(PREFIX + '_div.out', PREFIX + '_div_size.out'), shell = TRUE)
+ 
+#grep to remove lines with simple and satellite repeats 
+BADWORDS = ['Simple','Satellite']
+SIZE_OUT_LIST = []
+with open(PREFIX + '_div_size.out') as SIZE_OUT_FILE:
+        for LINE in SIZE_OUT_FILE:
+			if not any(BADWORD in LINE for BADWORD in BADWORDS):
+				SIZE_OUT_LIST.append(LINE)
 
-perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl -noCpG $ABBREV".align" >$ABBREV"_div.out" 
+#sed to remove extra '\', "#", and 'kimura=' and replace the first two with tabs.			
+for LINE in SIZE_OUT_LIST:
+	LINE.replace('\\', '\t')
+	LINE.replace('kimura=', '')
+	LINE.replace('#', '\t')
 
-#perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl $ABBREV".align" >$ABBREV"_wCpG_div.out"
+##Create a tmp file from the new list for use as an dataframe in pandas
+NEWFILE = open('tmp.bed', 'w')
+for LINE in SIZE_OUT_LIST:
+        NEWFILE.write(LINE)
+NEWFILE.close()
 
-perl /lustre/work/daray/software/RM.addsize.div.pl $ABBREV"_div.out" | grep -v Satellite | grep -v Simple_repeat | sed 's/kimura=//g' | sed 's/\#/\t/g' | sed 's/\//\t/g' >$ABBREV"_div_size.out"
+##Create a pandas dataframe from the tmp file, adding headers as you do so.
+OUT_ARRAY = pd.read_table('tmp.bed', names=['A', 'B', 'C', 'D', 'chrom', 'start', 'stop', 'size', 'E', 'strand', 'name', 'class', 'family', 'F', 'G', 'H', 'I', 'div'])
 
-#perl /lustre/work/daray/software/RM.addsize.div.pl $ABBREV"_wCpG_div.out" | grep -v Satellite | grep -v Simple_repeat | sed 's/kimura=//g' | sed 's/\#/\t/g' | sed 's/\//\t/g' >$ABBREV"_wCpG_div_size.out"
+##Delete the tmp file
+os.remove('tmp.bed')
 
-awk '{print $5 "\t" $6 "\t" $7 "\t" $11 "\t" $19 "\t" $10 "\t" $8 "\t" $12 "\t" $13 "\t" $18}' $ABBREV"_div_size.out" | sed 's/\tC\t/\t-\t/g' | sort -g -k 6,6 >$ABBREV"_sort_size.bed"
+##Rearrange the headers as you want
+RM_OUT_ARRAY = RM_OUT_ARRAY[['chrom', 'start', 'stop', 'name', 'size', 'strand' 'class', 'family', 'div']]
+#print(RM_OUT_ARRAY)
 
-#awk '{print $5 "\t" $6 "\t" $7 "\t" $11 "\t" $19 "\t" $10 "\t" $8 "\t" $12 "\t" $13}' $ABBREV"_wCpG_div_size.out" | sed 's/\tC\t/\t-\t/g' >$ABBREV"_wCpG_processed.out"
+##Replace 'C' with '-' in the 'strand' column. 
+RM_OUT_ARRAY.strand = RM_OUT_ARRAY.strand.replace({'C':'-'})
 
-awk '{if($7>=100)print;}' $ABBREV"_sort_size.bed" >$ABBREV"_select_size.bed"  
-
-#sort -g -k 9,9 $ABBREV"_processed.out" >$ABBREV"_sort_div.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_sort_div.out" >$ABBREV"_select_div.out"  
-
-#sort -g -k 6,6 $ABBREV"_processed.out" >$ABBREV"_sort_name.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_sort_name.out" >$ABBREV"_select_name.out"  
-
-#sort -g -k 7,7 $ABBREV"_processed.out" >$ABBREV"_sort_class.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_sort_class.out" >$ABBREV"_select_class.out"  
-
-#sort -g -k 8,8 $ABBREV"_processed.out" >$ABBREV"_sort_family.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_sort_family.out" >$ABBREV"_select_family.out"  
-
-#sort -g -k 4,4 $ABBREV"_wCpG_processed.out" >$ABBREV"_wCpG_sort_size.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_wCpG_sort_size.out" >$ABBREV"_wCpG_select_size.out"  
-
-#sort -g -k 9,9 $ABBREV"_wCpG_processed.out" >$ABBREV"_wCpG_sort_div.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_wCpG_sort_div.out" >$ABBREV"_wCpG_select_div.out"  
-
-#sort -g -k 6,6 $ABBREV"_wCpG_processed.out" >$ABBREV"_wCpG_sort_name.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_wCpG_sort_name.out" >$ABBREV"_wCpG_select_name.out"  
-
-#sort -g -k 7,7 $ABBREV"_wCpG_processed.out" >$ABBREV"_wCpG_sort_class.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_wCpG_sort_class.out" >$ABBREV"_wCpG_select_class.out"  
-
-#sort -g -k 8,8 $ABBREV"_wCpG_processed.out" >$ABBREV"_wCpG_sort_family.out"
-
-#awk '{if($4>=100)print;}' $ABBREV"_wCpG_sort_family.out" >$ABBREV"_wCpG_select_family.out"  
+##Write the dataframe to a file
+RM_OUT_ARRAY.to_csv(PREFIX + '_rm.bed', sep='\t', header=False, index=False)
 
 #gzip $ABBREV".align" &
 
