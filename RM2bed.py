@@ -37,11 +37,10 @@ def main():
 	if ALIGN.lower().endswith('gz'):
 		print('Using .gz file.')
 		TMP = PREFIX + '.tmp.file'
-		IN = gzip.open(ALIGN, 'rb')
-		with open(TMP, 'w') as OUT:
-			for LINE in IN:
-				OUT.write(LINE)
-		IN.close()
+		with gzip.open(ALIGN, 'rt') as IN:
+			with open(TMP, 'w') as OUT:
+				for LINE in IN:
+					OUT.write(LINE)
 	elif ALIGN.lower().endswith('align'):
 		print('Using .align file')
 		TMP = PREFIX + '.tmp.file'
