@@ -136,10 +136,12 @@ def main():
 
 ##Split into files if asked.
 	if SPLIT is not None:
+		print('Split files by ' + SPLIT)
 		if SPLIT in ['name', 'family', 'class']:
-			GROUPED = OUT_ARRAY.groupby(SPLIT)
-			for SPLITTYPE, GROUP in GROUPED:
-				GROUP.to_csv(PREFIX + '_' + GROUP + '_rm.bed', sep='\t', header=False, index=False)
+			CLUSTERED = OUT_ARRAY.sort_values([SPLIT])
+			for SPLITVALUE in CLUSTERED[SPLIT].unique():
+				CLUSTEREDW = CLUSTERED[CLUSTERED[SPLIT]==SPLITVALUE]
+				CLUSTEREDW.to_csv(PREFIX + '_' + SPLITVALUE + '_rm.bed', sep='\t', header=False, index=False)
 		else:
 			print('Splitting options are by name, family, and class.')			
 
