@@ -20,9 +20,9 @@ import fileinput
 import pandas as pd
 import sys
 
+
 ####MAIN function
 def main():
-	print('Starting MAIN.')
 
 ##Use the get_args function
 	ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT = get_args()
@@ -32,6 +32,12 @@ def main():
 	if PREFIX is None:
 		PREFIX = re.split("[_.]", ALIGN)[0]
 		print('No prefix provided. Will use ' + PREFIX)
+	else:
+		print('Prefix = ' + PREFIX)
+	if CRITERION is None:
+		pass
+	else:
+		print('Sort criterion is ' + CRITERION)
 
 ##Determine file type using extension and create a tmp.file to use.
 	if ALIGN.lower().endswith('gz'):
@@ -116,14 +122,26 @@ def main():
 
 ##Sort main output if asked.	
 	if CRITERION is not None:
-		OUT_ARRAY = sort_array([CRITERION])
-		
+		if CRITERION in ['name', 'family', 'class']:
+			OUT_ARRAY = OUT_ARRAY.sort_values([CRITERION])
+		elif CRITERION in ['size']:
+			OUT_ARRAY = OUT_ARRAY.sort_values([CRITERION], ascending = [0])
+		elif CRITERION in ['diverge']:
+			OUT_ARRAY = OUT_ARRAY.sort_values([CRITERION], ascending = [1])
+		else:
+			print('Choices are size, name, family, class, or diverge. Not sorting.')	
+
 ##Write the dataframe to a file
 	OUT_ARRAY.to_csv(PREFIX + '_rm.bed', sep='\t', header=False, index=False)
 
 ##Split into files if asked.
 	if SPLIT is not None:
-		OUT_ARRAY = split_array(OUT_ARRAY)
+		if SPLIT in ['name', 'family', 'class']:
+			GROUPED = OUT_ARRAY.groupby(SPLIT)
+			for SPLITTYPE, GROUP in GROUPED:
+				GROUP.to_csv(PREFIX + '_' + GROUP + '_rm.bed', sep='\t', header=False, index=False)
+		else:
+			print('Splitting options are by name, family, and class.')			
 
 ##Get arguments function
 def get_args():
@@ -142,30 +160,6 @@ def get_args():
 	SPLIT = args.split
 
 	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT
-
-##Sorting function
-def sort_array():
-##Options are: size, name, family, class, or diverge 
-	if CRITERION in ['name', 'family', 'class']:
-		OUT_ARRAY = OUT_ARRAY.sort([CRITERION])
-	elif CRITERION in ['size']:
-		OUT_ARRAY = OUT_ARRAY.sort([CRITERION], ascending = [0])
-	elif CRITERION in ['diverge']:
-		OUT_ARRAY = OUT_ARRAY.sort([CRITERION], ascending = [1])
-	else:
-		print('Choices are size, name, family, class, or diverge. Not sorting.')
-
-##File splitting function
-def split_array():
-##Options = name, family, class
-	if SPLIT in ['name', 'family', 'class']:
-		OUT_ARRAY_BYSPLIT = OUT_ARRAY.groupby(SPLIT)
-		for (name, name_df) in OUT_ARRAY_BYSPLIT:
-			OUT_ARRAY_BYSPLIT=split_array(OUT_ARRAY_BYSPLIT)
-			OUT_ARRAY_BYSPLIT.to_csv(PREFIX + '_' + SPLIT + '_rm.bed', sep='\t', header=False, index=False)
-	else:
-		print('Splitting options are by name, family, and class.')
-		
 
 if __name__ =="__main__":main()
 		
