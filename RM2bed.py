@@ -3,12 +3,9 @@
 ##to generate single or multiple sorted output 
 ##files in .bed format
 
-#To do
-#1. convert to python
-#2. add input options
-#2a. detect align.gz vs .align
-#2b. detect minimum size of hit
-#2c. detect output type for sorting, i.e. by size, by name, by family, etc.
+##VERY IMPORTANT CAVEAT - RepeatMasker output MUST have #Class/Family format.
+##If the second term is missing, the output files will not have the correct columns.
+##Examine the raw .out file from RepeatMasker and add the necessary term using sed before processing.
 
 from Bio import SeqIO
 import argparse
