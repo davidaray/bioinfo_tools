@@ -61,18 +61,18 @@ def main():
 		exit()
 
 ##Call subprocess, calcDivergenceFromAlign.Ray.pl, using perl. Keep the new file for troubleshooting.
-	print('Calculating divergences and saving to div.out file.')
+#	print('Calculating divergences and saving to div.out file.')
 	subprocess.check_call('perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl -noCpG {} >{}'.format(TMP, PREFIX + '_div.out'), shell=True)
 
 ##Delete tmp file.
-	print('Removing tmp file.')
+#	print('Removing tmp file.')
 	os.remove(TMP)
 
 ##Grep to remove lines with simple and satellite repeats. 
 ##Also replace '/' and '#' with tabs and delete 'kimura='.
-	print('Removing Simple and Satellite repeats.')
-	print('Replacing hashtags and slashes with tabs.')
-	print('Removing kimura=')
+#	print('Removing Simple and Satellite repeats.')
+#	print('Replacing hashtags and slashes with tabs.')
+#	print('Removing kimura=')
 	BADWORDS = ['Simple','Satellite']
 	DIV_OUT_LIST = []
 	with open(PREFIX + '_div.out') as DIV_OUT_FILE:
@@ -93,30 +93,30 @@ def main():
 	NEWFILE.close()
 
 ##Create a pandas dataframe from the tmp file, adding headers as you do so.
-	print('Reading in dataframe.')
+#	print('Reading in dataframe.')
 	OUT_ARRAY = pd.read_table(PREFIX + '.tmp.bed', sep='\t', names=['A', 'B', 'C', 'D', 'chrom', 'start', 'stop', 'E', 'strand', 'name', 'class', 'family', 'F', 'G', 'H', 'I', 'J', 'diverge'])
 #	OUT_ARRAY.to_csv(PREFIX + '_import_tmp.bed', sep='\t', header=False, index=False)
 
 ##Delete the tmp file
-#	os.remove(PREFIX + '.tmp.bed')
+	os.remove(PREFIX + '.tmp.bed')
 	
 ##Calculate size of insertion and add column to end of lines
-	print('Adding size column.')
+#	print('Adding size column.')
 	OUT_ARRAY['size'] = OUT_ARRAY['stop'].subtract(OUT_ARRAY['start'] -1)
 #	OUT_ARRAY.to_csv(PREFIX + '_addsize_tmp.bed', sep='\t', header=True, index=True)
 
 ##Rearrange the columns as you want
-	print('Rearranging columns.')
+#	print('Rearranging columns.')
 	OUT_ARRAY = OUT_ARRAY[['chrom', 'start', 'stop', 'name', 'size', 'strand', 'class', 'family', 'diverge']]
 #	OUT_ARRAY.to_csv(PREFIX + '_arrange_tmp.bed', sep='\t', header=True, index=True)
 
 ##Replace 'C' with '-' in the 'strand' column. 
-	print('Replacing C with -.')
+#	print('Replacing C with -.')
 	OUT_ARRAY.strand.replace('C', '-', inplace=True)
 #	OUT_ARRAY.to_csv(PREFIX + '_replaceC_tmp.bed', sep='\t', header=True, index=True)
 
 ##Filter by minsize
-	print('Filtering by minsize.')
+#	print('Filtering by minsize.')
 	OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['size'] >= MINSIZE]
 #	OUT_ARRAY.to_csv(PREFIX + '_minsize_tmp.bed', sep='\t', header=True, index=True)
 
@@ -131,7 +131,7 @@ def main():
 		else:
 			print('Choices are size, name, family, class, or diverge. Not sorting.')	
 
-##Write the dataframe to a file
+##Write the main output to a file
 	OUT_ARRAY.to_csv(PREFIX + '_rm.bed', sep='\t', header=False, index=False)
 
 ##Split into files if asked.
@@ -164,11 +164,3 @@ def get_args():
 	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT
 
 if __name__ =="__main__":main()
-		
-#gzip $ABBREV".align" &
-
-#gzip $ABBREV"_div.out" &
-
-#gzip $ABBREV"_wCpG_div.out" &
-
-
