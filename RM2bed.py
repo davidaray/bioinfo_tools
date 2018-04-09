@@ -27,7 +27,7 @@ import sys
 def main():
 
 ##Use the get_args function
-	ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS = get_args()
+	ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX = get_args()
 	print('Input file = ' + ALIGN)
 	
 ##If no prefix, get prefix from filename using the first part of the filename.
@@ -133,7 +133,17 @@ def main():
 		else:
 			print('Choices are size, name, family, class, or diverge. Not sorting.')	
 
+##Announce max hits limit			
+	if HITS is not None:
+		print('Will only output files with at least ' + str(HITS) + ' hits.')
+	
+##Apply max divergence if requested
+	if MAX is not None:
+		print('Will only output hits with divergences less than ' + str(MAX) + '.')
+		OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['diverge'] <= MAX]
+			
 ##Write the dataframe to a file
+	print('Writing main output to ' + PREFIX + '_rm.bed.')
 	OUT_ARRAY.to_csv(PREFIX + '_rm.bed', sep='\t', header=False, index=False)
 
 ##Split into files if asked. Also check to see if there is a minumum hit number and act accordingly.
@@ -143,7 +153,6 @@ def main():
 			CLUSTERED = OUT_ARRAY.sort_values([SPLIT])
 			for SPLITVALUE in CLUSTERED[SPLIT].unique():
 				if HITS is not None:
-					print('Will only output files with at least ' + HITS + ' hits.')
 					CLUSTEREDW = CLUSTERED[CLUSTERED[SPLIT]==SPLITVALUE]
 					COUNT_ROW = CLUSTEREDW.shape[0]
 					if COUNT_ROW >= HITS:
@@ -163,6 +172,7 @@ def get_args():
 	parser.add_argument('-p', '--prefix', type=str, help='Prefix to use for output file - default is first field of input filename')
 	parser.add_argument('-sp', '--split', type=str, help='Split into files based on name, family, class? This is optional.')
 	parser.add_argument('-n', '--minhitnum', type=int, help='Minimum number of hits in file before being created. Only implemented if --split option is invoked. Optional.')
+	parser.add_argument('-d', '--maxdiverge', type=float, help='Maximum divergence allowed in output file.')
 
 	args = parser.parse_args()
 	ALIGN = args.input
@@ -171,8 +181,9 @@ def get_args():
 	CRITERION = args.sortcriterion
 	SPLIT = args.split
 	HITS = args.minhitnum
+	MAX = args.maxdiverge
 
-	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS
+	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX
 
 if __name__ =="__main__":main()
 		
