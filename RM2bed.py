@@ -143,6 +143,7 @@ def main():
 			CLUSTERED = OUT_ARRAY.sort_values([SPLIT])
 			for SPLITVALUE in CLUSTERED[SPLIT].unique():
 				if HITS is not None:
+					print('Will only output files with at least ' + HITS + ' hits.')
 					CLUSTEREDW = CLUSTERED[CLUSTERED[SPLIT]==SPLITVALUE]
 					COUNT_ROW = CLUSTEREDW.shape[0]
 					if COUNT_ROW >= HITS:
