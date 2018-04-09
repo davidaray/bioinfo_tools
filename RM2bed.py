@@ -100,7 +100,7 @@ def main():
 #	OUT_ARRAY.to_csv(PREFIX + '_import_tmp.bed', sep='\t', header=False, index=False)
 
 ##Delete the tmp file
-#	os.remove(PREFIX + '.tmp.bed')
+	os.remove(PREFIX + '.tmp.bed')
 	
 ##Calculate size of insertion and add column to end of lines
 	print('Adding size column.')
