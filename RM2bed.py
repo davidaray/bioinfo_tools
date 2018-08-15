@@ -145,7 +145,7 @@ def main():
 ##Apply min divergence if requested
 	if MINDIV is not None:
 		print('Will only output hits with divergences greater than ' + str(MINDIV) + '.')
-		OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['diverge'] => MINDIV]
+		OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['diverge'] <= MINDIV]
 			
 ##Write the dataframe to a file
 	print('Writing main output to ' + PREFIX + '_rm.bed.')
