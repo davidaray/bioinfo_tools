@@ -27,7 +27,7 @@ import sys
 def main():
 
 ##Use the get_args function
-	ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX = get_args()
+	ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX, MINDIV = get_args()
 	print('Input file = ' + ALIGN)
 	
 ##If no prefix, get prefix from filename using the first part of the filename.
