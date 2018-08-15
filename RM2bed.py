@@ -141,6 +141,11 @@ def main():
 	if MAX is not None:
 		print('Will only output hits with divergences less than ' + str(MAX) + '.')
 		OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['diverge'] <= MAX]
+
+##Apply min divergence if requested
+	if MINDIV is not None:
+		print('Will only output hits with divergences greater than ' + str(MINDIV) + '.')
+		OUT_ARRAY = OUT_ARRAY[OUT_ARRAY['diverge'] => MINDIV]
 			
 ##Write the dataframe to a file
 	print('Writing main output to ' + PREFIX + '_rm.bed.')
@@ -173,6 +178,7 @@ def get_args():
 	parser.add_argument('-sp', '--split', type=str, help='Split into files based on name, family, class? This is optional.')
 	parser.add_argument('-n', '--minhitnum', type=int, help='Minimum number of hits in file before being created. Only implemented if --split option is invoked. Optional.')
 	parser.add_argument('-d', '--maxdiverge', type=float, help='Maximum divergence allowed in output file.')
+	parser.add_argument('-dmin', '--mindiverge', type=float, help='Minimum divergence allowed in output file.')
 
 	args = parser.parse_args()
 	ALIGN = args.input
@@ -182,8 +188,9 @@ def get_args():
 	SPLIT = args.split
 	HITS = args.minhitnum
 	MAX = args.maxdiverge
+	MINDIV = args.mindiverge
 
-	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX
+	return ALIGN, MINSIZE, PREFIX, CRITERION, SPLIT, HITS, MAX, MINDIV
 
 if __name__ =="__main__":main()
 		
@@ -192,5 +199,3 @@ if __name__ =="__main__":main()
 #gzip $ABBREV"_div.out" &
 
 #gzip $ABBREV"_wCpG_div.out" &
-
-
