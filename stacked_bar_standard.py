@@ -10,7 +10,7 @@ import argparse
 def main():
 
 ##Use the get_args function
-	INPUT, TWEAK, LEGEND, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS = get_args()
+	INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS = get_args()
 	print('Input file = ' + INPUT)
 
 	PREFIX = re.split("[.]", INPUT)[0]
@@ -23,16 +23,34 @@ def main():
 		INPUTFRAME = INPUTFRAME.transpose()
 #Create a figure object
 		plt.figure()
-		if LEGEND == 'n':
-#Create a stacked bar plot without a legend embedded
+		if LEGEND == 'n' and ORIENT == 'v':
+#Create a vertical stacked bar plot without a legend embedded
 			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
 #Save the figure to a png
-			FIG.figure.savefig(PREFIX + '_nolegend.png')
+			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
+		elif LEGEND == 'n' and ORIENT == 'h':
+#Create a horizontal stacked bar plot without a legend embedded
+			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+#Save the figure to a png
+			FIG.figure.savefig(PREFIX + '_horizontal nolegend.png')
+		elif LEGEND == 'y' and ORIENT == 'v':
+#Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
+			plt.subplot(111)
+#Create a stacked bar plot without a legend embedded
+			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+#Get position data for the bar plot
+			BOX = FIG.get_position()
+#Narrow the width of the plot to allow for the external legend
+			FIG.set_position([BOX.x0, BOX.y0, BOX.width * BOXWIDTH, BOX.height])
+#Create the legend and add to the plot. 
+			plt.legend(loc=0, bbox_to_anchor=(SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, 	SUBPLOTHEIGHT), ncol=COLUMNS, fontsize='small', borderaxespad=0.)
+#Save the figure to a png
+			FIG.figure.savefig(PREFIX + '_' + str(SUBPLOTHORIZONAL) + '_' +  str(SUBPLOTVERTICAL) + '_' +  str(SUBPLOTWIDTH) + '_' +  str(SUBPLOTHEIGHT) + '.png')
 		else:
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
 		#Create a stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
 #Get position data for the bar plot
 			BOX = FIG.get_position()
 #Narrow the width of the plot to allow for the external legend
@@ -46,14 +64,23 @@ def main():
 		INPUTFRAME = pd.read_table(INPUT, sep = '\t', index_col=0)
 		INPUTFRAME = INPUTFRAME.transpose()
 		plt.figure()
-		if LEGEND == 'n':
+		if LEGEND == 'n' and ORIENT == 'v':
 			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
-			FIG.figure.savefig(PREFIX + '_nolegend.png')
-		else:
+			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
+		elif LEGEND == 'n' and ORIENT == 'h':
+			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.png')
+		elif LEGEND == 'y' and ORIENT == 'v':
 			plt.subplot(111) 
 			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
-			FIG.figure.savefig(PREFIX + '_standardplot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+			FIG.figure.savefig(PREFIX + '_standard_vertival_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+		else:
+			plt.subplot(111) 
+			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
+			FIG.figure.savefig(PREFIX + '_standard_horizontal_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+			
 
 ##Get arguments function
 def get_args():
@@ -61,6 +88,7 @@ def get_args():
 	parser.add_argument('-i', '--input', type=str, help='Name of the input file to be parsed', required=True)
 	parser.add_argument('-t', '--tweak', type=str, help='y = personalized, need extra arguments. Anything else = standard plot.', required=True)
 	parser.add_argument('-l', '--legend', type=str, help='n = do not include legend. Default = y.', default='y', required=True)
+	parser.add_argument('-o', '--orientation', type=str, help='Vertical bars (v) or horizontal (h).', default='v')
 	parser.add_argument('-d', '--datatype', type=str, help='CLASS, FAMILY, SINE, LINE, LTR, etc., depending on file')
 	parser.add_argument('-b', '--boxwidth', type=float, help='Fraction of the standard size plot to allow for plotting the legend outside of that box. 0.8 (80%) will usually work')
 	parser.add_argument('-ho', '--subplothorizontal', type=float, help='Number to indicate where to horizontally place the legend. Default is 1.01, just to the right of the main plot.', default = 1.01)
@@ -73,6 +101,7 @@ def get_args():
 	INPUT = args.input
 	TWEAK = args.tweak
 	LEGEND = args.legend
+	ORIENT = args.orientation
 	DATATYPE = args.datatype
 	BOXWIDTH = args.boxwidth
 	SUBPLOTHORIZONAL = args.subplothorizontal
@@ -81,7 +110,7 @@ def get_args():
 	SUBPLOTHEIGHT = args.subplotheight
 	COLUMNS = args.numcol
 
-	return INPUT, TWEAK, LEGEND, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS
+	return INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS
 
 if __name__ =="__main__":main()	
 	
