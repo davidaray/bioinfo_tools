@@ -26,19 +26,19 @@ def main():
 		colors = plt.cm.tab20c(np.linspace(0, 1, 24)) #see https://matplotlib.org/tutorials/colors/colormaps.html
 		if LEGEND == 'n' and ORIENT == 'v':
 #Create a vertical stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
 		elif LEGEND == 'n' and ORIENT == 'h':
 #Create a horizontal stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_horizontal nolegend.png')
 		elif LEGEND == 'y' and ORIENT == 'v':
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
 #Create a stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 #Get position data for the bar plot
 			BOX = FIG.get_position()
 #Narrow the width of the plot to allow for the external legend
@@ -51,7 +51,7 @@ def main():
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
 		#Create a stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 #Get position data for the bar plot
 			BOX = FIG.get_position()
 #Narrow the width of the plot to allow for the external legend
@@ -67,19 +67,19 @@ def main():
 		plt.figure()
 		colors = plt.cm.tab20c(np.linspace(0, 1, 24))
 		if LEGEND == 'n' and ORIENT == 'v':
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
 		elif LEGEND == 'n' and ORIENT == 'h':
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.png')
 		elif LEGEND == 'y' and ORIENT == 'v':
 			plt.subplot(111) 
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
 			FIG.figure.savefig(PREFIX + '_standard_vertival_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 		else:
 			plt.subplot(111) 
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
 			FIG.figure.savefig(PREFIX + '_standard_horizontal_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 			

@@ -10,7 +10,7 @@ import argparse
 def main():
 
 ##Use the get_args function
-	INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS = get_args()
+	INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS, SPACE = get_args()
 	print('Input file = ' + INPUT)
 
 	PREFIX = re.split("[.]", INPUT)[0]
@@ -25,19 +25,19 @@ def main():
 		plt.figure()
 		if LEGEND == 'n' and ORIENT == 'v':
 #Create a vertical stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
 		elif LEGEND == 'n' and ORIENT == 'h':
 #Create a horizontal stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_horizontal nolegend.png')
 		elif LEGEND == 'y' and ORIENT == 'v':
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
 #Create a stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 #Get position data for the bar plot
 			BOX = FIG.get_position()
 #Narrow the width of the plot to allow for the external legend
@@ -50,7 +50,7 @@ def main():
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
 		#Create a stacked bar plot without a legend embedded
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 #Get position data for the bar plot
 			BOX = FIG.get_position()
 #Narrow the width of the plot to allow for the external legend
@@ -65,19 +65,19 @@ def main():
 		INPUTFRAME = INPUTFRAME.transpose()
 		plt.figure()
 		if LEGEND == 'n' and ORIENT == 'v':
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
 		elif LEGEND == 'n' and ORIENT == 'h':
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.png')
 		elif LEGEND == 'y' and ORIENT == 'v':
 			plt.subplot(111) 
-			FIG = INPUTFRAME.plot.bar(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
-			FIG.figure.savefig(PREFIX + '_standard_vertival_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+			FIG.figure.savefig(PREFIX + '_standard_vertical_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 		else:
 			plt.subplot(111) 
-			FIG = INPUTFRAME.plot.barh(stacked=True, legend=False)
+			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
 			FIG.figure.savefig(PREFIX + '_standard_horizontal_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 			
@@ -96,6 +96,7 @@ def get_args():
 	parser.add_argument('-w', '--subplotwidth', type=float, help='Number to indicate how wide the legend should be. Default is .1, enough for one column.', default = .1)
 	parser.add_argument('-sh', '--subplotheight', type=float, help='Number to indicate how tall the legend should be. Usually done automatically. Default = .1', default = 1)
 	parser.add_argument('-c', '--numcol', type=int, help='Number of columns in the legend. Default = 1', default = 1)
+	parser.add_argument('-s', '--spacing', type=float, help='Bar spacing. 1 = no space. 0 = no bar. Default = 0.9.', default = 0.9)
 
 	args = parser.parse_args()
 	INPUT = args.input
@@ -109,8 +110,9 @@ def get_args():
 	SUBPLOTWIDTH = args.subplotwidth
 	SUBPLOTHEIGHT = args.subplotheight
 	COLUMNS = args.numcol
+	SPACE = args.spacing
 
-	return INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS
+	return INPUT, TWEAK, LEGEND, ORIENT, DATATYPE, BOXWIDTH, SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, SUBPLOTHEIGHT, COLUMNS, SPACE
 
 if __name__ =="__main__":main()	
 	
