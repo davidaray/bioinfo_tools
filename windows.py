@@ -17,7 +17,8 @@ def main():
 
 #initialize a list of GC content
 	GCLIST = []
-
+	SCAFFCOUNT = 0
+	WINDOWCOUNT = 0
 #populate the list
 #for every record in your genome
 	for SEQRECORD in SeqIO.parse(GENOME, 'fasta'):
@@ -25,8 +26,10 @@ def main():
 		SEQUENCE = SEQRECORD.seq
 #check to see if it's over 30000 br
 		if len(SEQUENCE) > 30000:
+			SCAFFCOUNT = SCAFFCOUNT + 1
 #if so, use the windows function to get each window
 			for SUBSEQ in windows(SEQUENCE, WINDOWSIZE, STEP):
+				WINDOWCOUNT = WINDOWCOUNT + 1
 #calculate the GC content for that window
 				WINDOWGC = GC(SUBSEQ)
 #add that number to the growing list
@@ -35,6 +38,10 @@ def main():
 #build histogram
 	plt.hist(GCLIST)
 	plt.savefig("GChist.png")
+
+#output basic stats
+	print('Scaffolds over 30kb = ' + str(SCAFFCOUNT) + '.')
+	print('Window count = ' + str(WINDOWCOUNT) + '.')
 
 #create function that will extract each window from the input file
 def windows(SEQUENCE, WINSIZE, STEPSIZE):
@@ -57,3 +64,4 @@ def get_args():
 
 if __name__ =="__main__":main()
         
+
