@@ -24,7 +24,7 @@ def main():
 			COUNTS.append(COUNT)
 	
 		OUTFRAME = pd.DataFrame({'NAME': IN_UNIQUE, 'COUNT': COUNTS})
-		OUTFRAME.sort_values('COUNT', ascending=False)
+		OUTFRAME.sort_values('COUNT', ascending=False, inplace=True)
 		OUTFRAME.to_csv(PREFIX + '_' + CLASSTOCOUNT + '_counts.csv', sep='\t', index=False)
 	
 	for CLASS in CLASSES:
