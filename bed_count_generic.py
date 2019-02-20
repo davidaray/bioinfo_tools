@@ -11,7 +11,8 @@ def main():
 	BED = get_args()
 	BASEPREFIX = os.path.basename(BED)
 	PREFIX = re.split("[.]", BASEPREFIX)[0]
-	ANIMAL = re.split("[_rm]", BASEPREFIX)[0]
+	WORD = BASEPREFIX.replace('_rm', '|')
+	ANIMAL = re.split("[|]", WORD)[0]
 	print(ANIMAL)
 
 	IN_BED = pd.read_table(BED, sep='\t', names=['chrom', 'start', 'stop', 'name', 'size', 'strand', 'class', 'family', 'diverge'])
@@ -41,7 +42,7 @@ def main():
 			TELIST = OUTFRAME1000['NAME'].tolist()
 #			print(TELIST)
 			for TENAME in TELIST:
-				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
 		else:
 #			print(PREFIX + ' does not exist.')
 			os.mkdir(DIR + '/' + PREFIX + '/')
@@ -51,7 +52,7 @@ def main():
 			TELIST = OUTFRAME1000['NAME'].tolist()
 #			print(TELIST)
 			for TENAME in TELIST:
-				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
 	
 	for CLASS in CLASSES:
 		DO_COUNT(CLASS)
