@@ -1,13 +1,18 @@
 import argparse
 import pandas as pd
 import re
+import os
+import subprocess
 
 ####MAIN function
 def main():
 
 ##Use the get_args function
 	BED = get_args()
-	PREFIX = re.split("[.]", BED)[0]
+	BASEPREFIX = os.path.basename(BED)
+	PREFIX = re.split("[.]", BASEPREFIX)[0]
+	ANIMAL = re.split("[_rm]", BASEPREFIX)[0]
+	print(ANIMAL)
 
 	IN_BED = pd.read_table(BED, sep='\t', names=['chrom', 'start', 'stop', 'name', 'size', 'strand', 'class', 'family', 'diverge'])
 
@@ -26,6 +31,27 @@ def main():
 		OUTFRAME = pd.DataFrame({'NAME': IN_UNIQUE, 'COUNT': COUNTS})
 		OUTFRAME.sort_values('COUNT', ascending=False, inplace=True)
 		OUTFRAME.to_csv(PREFIX + '_' + CLASSTOCOUNT + '_counts.txt', sep='\t', index=False)
+		
+		DIR = r'/lustre/scratch/daray/200mammals/SINEandLINE/'
+		if os.path.isdir(DIR + '/' + PREFIX + '/'):
+#			print(PREFIX + ' exists.')
+			OUTFRAME1000 = OUTFRAME[OUTFRAME['COUNT'] >= 1000]
+			OUTFRAME1000.to_csv(DIR + '/' + PREFIX + '/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
+#			print(OUTFRAME1000)
+			TELIST = OUTFRAME1000['NAME'].tolist()
+#			print(TELIST)
+			for TENAME in TELIST:
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
+		else:
+#			print(PREFIX + ' does not exist.')
+			os.mkdir(DIR + '/' + PREFIX + '/')
+			OUTFRAME1000 = OUTFRAME[OUTFRAME['COUNT'] >= 1000]
+			OUTFRAME1000.to_csv(DIR + '/' + PREFIX + '/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
+#			print(OUTFRAME1000)
+			TELIST = OUTFRAME1000['NAME'].tolist()
+#			print(TELIST)
+			for TENAME in TELIST:
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
 	
 	for CLASS in CLASSES:
 		DO_COUNT(CLASS)
