@@ -10,8 +10,11 @@ def main():
 ##Use the get_args function
 	BED = get_args()
 	BASEPREFIX = os.path.basename(BED)
+#	print(BASEPREFIX)
 	PREFIX = re.split("[.]", BASEPREFIX)[0]
-	WORD = BASEPREFIX.replace('_rm', '|')
+#	print(PREFIX)
+	WORD = BASEPREFIX.replace('_young_rm', '|')
+#	print(WORD)
 	ANIMAL = re.split("[|]", WORD)[0]
 	print(ANIMAL)
 
@@ -34,25 +37,27 @@ def main():
 		OUTFRAME.to_csv(PREFIX + '_' + CLASSTOCOUNT + '_counts.txt', sep='\t', index=False)
 		
 		DIR = r'/lustre/scratch/daray/200mammals/SINEandLINE/'
-		if os.path.isdir(DIR + '/' + PREFIX + '/'):
+		if os.path.isdir(DIR + '/' + ANIMAL + '_young/'):
 #			print(PREFIX + ' exists.')
 			OUTFRAME1000 = OUTFRAME[OUTFRAME['COUNT'] >= 1000]
-			OUTFRAME1000.to_csv(DIR + '/' + PREFIX + '/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
+			OUTFRAME1000.to_csv(DIR + '/' + ANIMAL + '_young/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
 #			print(OUTFRAME1000)
 			TELIST = OUTFRAME1000['NAME'].tolist()
 #			print(TELIST)
 			for TENAME in TELIST:
-				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', ANIMAL + '_young'), shell=True) 
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', ANIMAL + '_young'), shell=True)
 		else:
 #			print(PREFIX + ' does not exist.')
-			os.mkdir(DIR + '/' + PREFIX + '/')
+			os.mkdir(DIR + '/' + ANIMAL + '_young/')
 			OUTFRAME1000 = OUTFRAME[OUTFRAME['COUNT'] >= 1000]
-			OUTFRAME1000.to_csv(DIR + '/' + PREFIX + '/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
+			OUTFRAME1000.to_csv(DIR + '/' + ANIMAL + '_young/' + ANIMAL + '_' + CLASSTOCOUNT + '_outframe1000.txt', sep='\t', index=False)
 #			print(OUTFRAME1000)
 			TELIST = OUTFRAME1000['NAME'].tolist()
 #			print(TELIST)
 			for TENAME in TELIST:
-				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', PREFIX), shell=True) 
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/cons_comb/{}*_cons_comb.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', ANIMAL + '_young'), shell=True)
+				subprocess.check_call('cp /lustre/scratch/daray/200mammals/analyses/{}/extract_align/muscle/{}*.muscle.fas /lustre/scratch/daray/200mammals/SINEandLINE/{}/' .format (ANIMAL, TENAME + '_', ANIMAL + '_young'), shell=True)
 	
 	for CLASS in CLASSES:
 		DO_COUNT(CLASS)
