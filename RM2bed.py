@@ -63,27 +63,47 @@ def main():
 		exit()
 
 ##Call subprocess, calcDivergenceFromAlign.Ray.pl, using perl. Keep the new file for troubleshooting.
-	print('Calculating divergences and saving to div.out file.')
-	subprocess.check_call('perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl -noCpG {} >{}'.format(TMP, PREFIX + '_div.out'), shell=True)
+	print('Calculating divergences and saving to tmp_div.out file.')
+	subprocess.check_call('perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.Ray.pl -noCpG {} >{}'.format(TMP, PREFIX + '_tmp_div.out'), shell=True)
 
 ##Delete tmp file.
 	print('Removing tmp file.')
 	os.remove(TMP)
+		
+##Simple repeats are a problem with .out files. They sometimes lack the Class/Family structure. Fix this here.
+	INFILE = PREFIX + '_tmp_div.out'
+	OUTFILE1 = open(PREFIX + '_div1.out', 'w')
+	INFILE1 = PREFIX + '_div1.out'
+	OUTFILE2 = open(PREFIX + '_div2.out', 'w')
+	INFILE2 = PREFIX + '_div2.out'
+	OUTFILE3 = open(PREFIX + '_div3.out', 'w')
+	INFILE3 = PREFIX + '_div3.out'
+	OUTFILE4 = open(PREFIX + '_div4.out', 'w')
+	INFILE4 = PREFIX + '_div4.out'
+	OUTFILE5 = open(PREFIX + '_div.out', 'w')
+	subprocess.call(['sed', 's/#Simple_repeat/#Simple_repeat\/Simple_repeat/g', INFILE], stdout=OUTFILE1)
+	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Simple_repeat/#Simple_repeat\/Simple_repeat/g', INFILE1], stdout=OUTFILE2)
+	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Satellite/#Simple_repeat\/Satellite/g', INFILE2], stdout=OUTFILE3) 
+	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Low_complexity/#Simple_repeat\/Low_complexity/g', INFILE3], stdout=OUTFILE4) 
+	subprocess.call(['sed', 's/#rRNA/#rRNA\/rRNA/g', INFILE4], stdout=OUTFILE5) 
+	OUTFILE1.close()
+	OUTFILE2.close()
+	OUTFILE3.close()
+	OUTFILE4.close()
+	os.remove(PREFIX + '_div1.out')
+	os.remove(PREFIX + '_div2.out')
+	os.remove(PREFIX + '_div3.out')
+	os.remove(PREFIX + '_div4.out')
 
-##Grep to remove lines with simple and satellite repeats. 
 ##Also replace '/' and '#' with tabs and delete 'kimura='.
-	print('Removing Simple and Satellite repeats.')
 	print('Replacing hashtags and slashes with tabs.')
 	print('Removing kimura=')
-	BADWORDS = ['Simple','Satellite']
 	DIV_OUT_LIST = []
 	with open(PREFIX + '_div.out') as DIV_OUT_FILE:
 		for LINE in DIV_OUT_FILE:
 			LINE = re.sub(' +','\t', LINE)
 			LINE = LINE.lstrip()
 			LINE = LINE.replace('/', '\t').replace('kimura=', '').replace('#', '\t')		
-			DIV_OUT_LIST.append(LINE)
-		if not any(WORD in LINE for WORD in BADWORDS):
 			DIV_OUT_LIST.append(LINE)
 
 ##Create a tmp file from the new list for use as an dataframe in pandas
