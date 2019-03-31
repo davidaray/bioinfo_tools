@@ -85,7 +85,7 @@ def main():
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Simple_repeat/#Simple_repeat\/Simple_repeat/g', INFILE1], stdout=OUTFILE2)
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Satellite/#Simple_repeat\/Satellite/g', INFILE2], stdout=OUTFILE3) 
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Low_complexity/#Simple_repeat\/Low_complexity/g', INFILE3], stdout=OUTFILE4) 
-	subprocess.call(['sed', 's/#rRNA/#rRNA\/rRNA/g', INFILE4], stdout=OUTFILE5) 
+	subprocess.call(['sed', 's/#rRNA/rRNA\/#rRNA/g', INFILE4], stdout=OUTFILE5) 
 	OUTFILE1.close()
 	OUTFILE2.close()
 	OUTFILE3.close()
