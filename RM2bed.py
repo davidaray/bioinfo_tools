@@ -80,20 +80,25 @@ def main():
 	INFILE3 = PREFIX + '_div3.out'
 	OUTFILE4 = open(PREFIX + '_div4.out', 'w')
 	INFILE4 = PREFIX + '_div4.out'
-	OUTFILE5 = open(PREFIX + '_div.out', 'w')
+	OUTFILE5 = open(PREFIX + '_div5.out', 'w')
+	INFILE5 = PREFIX + '_div5.out'
+	OUTFILE6 = open(PREFIX + '_div.out', 'w')
 	subprocess.call(['sed', 's/#Simple_repeat/#Simple_repeat\/Simple_repeat/g', INFILE], stdout=OUTFILE1)
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Simple_repeat/#Simple_repeat\/Simple_repeat/g', INFILE1], stdout=OUTFILE2)
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Satellite/#Simple_repeat\/Satellite/g', INFILE2], stdout=OUTFILE3) 
 	subprocess.call(['sed', 's/#Simple_repeat\/Simple_repeat\/Low_complexity/#Simple_repeat\/Low_complexity/g', INFILE3], stdout=OUTFILE4) 
-	subprocess.call(['sed', 's/#rRNA/rRNA\/#rRNA/g', INFILE4], stdout=OUTFILE5) 
+	subprocess.call(['sed', 's/#rRNA/#rRNA\/rRNA/g', INFILE4], stdout=OUTFILE5) 
+	subprocess.call(['sed', 's/#rRNA\/rRNA\/rRNA/#rRNA\/rRNA/g', INFILE5], stdout=OUTFILE6) 
 	OUTFILE1.close()
 	OUTFILE2.close()
 	OUTFILE3.close()
 	OUTFILE4.close()
+	OUTFILE5.close()
 	os.remove(PREFIX + '_div1.out')
 	os.remove(PREFIX + '_div2.out')
 	os.remove(PREFIX + '_div3.out')
 	os.remove(PREFIX + '_div4.out')
+	os.remove(PREFIX + '_div5.out')
 
 ##Also replace '/' and '#' with tabs and delete 'kimura='.
 	print('Replacing hashtags and slashes with tabs.')
