@@ -127,21 +127,21 @@ def main():
 	COMBINEDFAMILYFRAME.sort_index(inplace=True)		
 	COMBINEDFAMILYFRAME.to_csv(PREFIX + '_all_taxa_families_merged_cats.txt', sep='\t', index=True)
 
-	print('Generating a combined dataframe for all TEs.')
+#	print('Generating a combined dataframe for all TEs.')
 	#Sum proportions for each family and generate an output file
-	COMBINEDTEFRAME = pd.DataFrame(0, index=range(len(TELIST)), columns=range(TAXALENGTH))
-	COMBINEDTEFRAME.index = TELIST
-	COMBINEDTEFRAME.columns = NEWNAMES
+#	COMBINEDTEFRAME = pd.DataFrame(0, index=range(len(TELIST)), columns=range(TAXALENGTH))
+#	COMBINEDTEFRAME.index = TELIST
+#	COMBINEDTEFRAME.columns = NEWNAMES
 
 	#Fill in the proportions for each family name
-	for TAXON in TAXA:
-		for TENAME in TELIST:
-			#print('Working on ' + str(TAXON) + ' and ' + str(TENAME))
-			TEPROP = ALLCOMBINEDDATAFRAME.loc[ALLCOMBINEDDATAFRAME[TAXON + '_TE'] == TENAME, TAXON + '_prop'].sum() 
-			COMBINEDTEFRAME.loc[TENAME, TAXON] = TEPROP
+#	for TAXON in TAXA:
+#		for TENAME in TELIST:
+#			#print('Working on ' + str(TAXON) + ' and ' + str(TENAME))
+#			TEPROP = ALLCOMBINEDDATAFRAME.loc[ALLCOMBINEDDATAFRAME[TAXON + '_TE'] == TENAME, TAXON + '_prop'].sum() 
+#			COMBINEDTEFRAME.loc[TENAME, TAXON] = TEPROP
 
-	COMBINEDTEFRAME.sort_index(inplace=True)		
-	COMBINEDTEFRAME.to_csv(PREFIX + '_all_taxa_TEs_merged_cats.txt', sep='\t', index=True)
+#	COMBINEDTEFRAME.sort_index(inplace=True)		
+#	COMBINEDTEFRAME.to_csv(PREFIX + '_all_taxa_TEs_merged_cats.txt', sep='\t', index=True)
 
 	#Get lists of each subset of families in each class 
 	print('Generating lists of families within each class')
