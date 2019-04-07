@@ -9,10 +9,10 @@ def main():
 		TELIST = FILE.read().splitlines()
 	
 	with open(OUT, 'w') as OUTPUT:
-		for TE in TELIST:
-			for SEQRECORD in SeqIO.parse(FAMILIES, 'fasta'):
-				if TE + '#' in SEQRECORD.id:
-					SeqIO.write(SEQRECORD, OUTPUT, 'fasta')
+		for SEQRECORD in SeqIO.parse(FAMILIES, 'fasta'):
+			ID = SEQRECORD.id.split('#')[0]
+			if ID in TELIST:
+				SeqIO.write(SEQRECORD, OUTPUT, 'fasta')
 
 def get_args():
 	parser = argparse.ArgumentParser(description="Will pull sequences from a modified RepeatModeler output families.fa file using a text file processed using our 200 mammals qsub.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
