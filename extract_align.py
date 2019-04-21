@@ -21,24 +21,25 @@ def get_args():
 	parser.add_argument('-g', '--genome_fasta', type=str, help='Name of the fasta formatted genome to be queried.', required=True)
 	parser.add_argument('-b', '--blastfile', type=str, help='Blast output to be used. Must be formatted using "outfmt 6".', required = True)
 	parser.add_argument('-l', '--library', type=str, help='Library of putative TE consensus sequences to be extracted and aligned. Must be in fasta format with no # or / in the headers.', required = True)
-	parser.add_argument('-bu', '--buffer', type=int, help='Buffer size. The number of bp of flanking sequence for each hit to be extracted along with the hit. Optional, Default = 1000', default = 1000)
+	parser.add_argument('-lb', '--leftbuffer', type=int, help='Left buffer size. The number of bp of flanking sequence for each hit to be extracted along with the hit. Optional, Default = 1000', default = 1000)
+	parser.add_argument('-rb', '--rightbuffer', type=int, help='Right beffer size. The number of bp of flanking sequence for each hit to be extracted along with the hit. Optional, Default = 1000', default = 1000)
 	parser.add_argument('-n', '--hitnumber', type=int, help='The number of hits to be exracted. Optional. Default = 50.', default = 50)
 	parser.add_argument('-a', '--align', type=str, help='Align the output fasta file, y or n?. Default is y.', default = 'y')
 	parser.add_argument('-e', '--emboss', type=str, help='Generate a trimal/emboss consensus, y or n. Optional.', default = 'y')
 	parser.add_argument("-log", "--log_level", default="INFO")
 
-
 	args = parser.parse_args()
 	GENOMEFA = args.genome_fasta
 	BLAST = args.blastfile
 	LIB = args.library
-	BUFFER = args.buffer
+	LBUFFER = args.leftbuffer
+	RBUFFER = args.rightbuffer
 	HITNUM = args.hitnumber
 	ALIGN = args.align
 	EMBOSS = args.emboss
 	LOG = args.log_level
 
-	return GENOMEFA, BLAST, LIB, BUFFER, HITNUM, ALIGN, EMBOSS, LOG
+	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, EMBOSS, LOG
 
 ## Create TE outfiles function. Creates files for populating with blast hits.
 def CREATE_TE_OUTFILES(LIBRARY):
@@ -50,7 +51,7 @@ def CREATE_TE_OUTFILES(LIBRARY):
 		SeqIO.write(record, 'tmpTEfiles/' + NEWID + '.fa', 'fasta')
 				
 ## Organize blast hits function. Will read in blast file, sort based on e-value and bitscore, deterine top BUFFER hits for extraction, extract, and combine with TE file from previous function.
-def EXTRACT_BLAST_HITS(GENOME, BLAST, BUFFER, HITNUM):
+def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 ##Read in blast data
 	BLASTDF = pd.read_table(BLAST, sep='\t', names=['QUERYNAME', 'SCAFFOLD', 'C', 'D', 'E', 'F', 'QUERYSTART', 'QUERYSTOP', 'SCAFSTART', 'SCAFSTOP', 'E-VALUE', 'BITSCORE'])
 ##Convert to bed format
@@ -72,13 +73,13 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, BUFFER, HITNUM):
 		QUERYFRAME.to_csv('tmpbedfiles/' + QUERY + '.bed', sep='\t', header=False, index=False)
 		CURRENTBED = BedTool('tmpbedfiles/' + QUERY + '.bed')
 		GENOMEPREFIX = os.path.splitext(GENOME)[0]
-		SLOPBED = CURRENTBED.slop(g=GENOMEPREFIX + '.fai', b=BUFFER, output='tmpbedfiles/' + QUERY + '.slop')
+		SLOPBED = CURRENTBED.slop(g=GENOMEPREFIX + '.fai', l=LBUFFER, r=RBUFFER, output='tmpbedfiles/' + QUERY + '.slop')
 		SLOPBED = BedTool('tmpbedfiles/' + QUERY + '.slop')
 		FASTA = SLOPBED.sequence(fi=GENOME, s=True)
 		FASTASAVE = SLOPBED.save_seqs('tmpextracts/' + QUERY + '.fa')
 		os.remove('tmpbedfiles/' +  QUERY + '.slop')
 		os.remove('tmpbedfiles/' + QUERY + '.bed')
-		subprocess.check_call('cat {} {} >{}'.format('tmpextracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
+		subprocess.run('cat {} {} >{}'.format('tmpextracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
 #		COUNTER = COUNTER + 1
 		
 ##Alignment function
@@ -103,7 +104,7 @@ def DIRS(DIR):
 ####MAIN function
 def main():	
 ##Get input arguments
-	GENOMEFA, BLAST, LIB, BUFFER, HITNUM, ALIGN, EMBOSS, LOG = get_args()
+	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, EMBOSS, LOG = get_args()
 
 # Setup logging and script timing
 	handlers = [logging.FileHandler('extract_align.log'), logging.StreamHandler()]
@@ -117,7 +118,8 @@ def main():
 	LOGGER.info('Genome file: ' + GENOMEFA)
 	LOGGER.info('Blast file: ' + BLAST)
 	LOGGER.info('TE library: ' + LIB)
-	LOGGER.info('Buffer size: ' + str(BUFFER))
+	LOGGER.info('Left buffer size: ' + str(LBUFFER))
+	LOGGER.info('Right buffer size: ' + str(RBUFFER))
 	LOGGER.info('Number of hits evaluated: ' + str(HITNUM))
 	LOGGER.info('Muscle alignment = ' + ALIGN)
 	LOGGER.info('Trimal/Emboss consensus = ' + EMBOSS)
@@ -158,7 +160,7 @@ def main():
 	CREATE_TE_OUTFILES(LIB)
 	
 ##Extract hits and combine them with the TE out files if flagged
-	EXTRACT_BLAST_HITS(GENOMEFA, BLAST, BUFFER, HITNUM)
+	EXTRACT_BLAST_HITS(GENOMEFA, BLAST, LBUFFER, RBUFFER, HITNUM)
 	
 ##Align extracted hits if flagged
 	if ALIGN == 'y':
