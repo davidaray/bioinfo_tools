@@ -4,7 +4,7 @@ plt.switch_backend('Agg')
 from pylab import savefig
 import re
 import argparse
-
+import numpy as np
 
 ####MAIN function
 def main():
@@ -28,11 +28,13 @@ def main():
 			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
+			FIG.figure.savefig(PREFIX + '_vertical_nolegend.svg', format='svg')
 		elif LEGEND == 'n' and ORIENT == 'h':
 #Create a horizontal stacked bar plot without a legend embedded
 			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_horizontal nolegend.png')
+			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.svg', format='svg')
 		elif LEGEND == 'y' and ORIENT == 'v':
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
@@ -46,6 +48,7 @@ def main():
 			plt.legend(loc=0, bbox_to_anchor=(SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, 	SUBPLOTHEIGHT), ncol=COLUMNS, fontsize='small', borderaxespad=0.)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_' + str(SUBPLOTHORIZONAL) + '_' +  str(SUBPLOTVERTICAL) + '_' +  str(SUBPLOTWIDTH) + '_' +  str(SUBPLOTHEIGHT) + '.png')
+			FIG.figure.savefig(PREFIX + '_' + str(SUBPLOTHORIZONAL) + '_' +  str(SUBPLOTVERTICAL) + '_' +  str(SUBPLOTWIDTH) + '_' +  str(SUBPLOTHEIGHT) + '.svg', format='svg')
 		else:
 #Create a subplot for the legend (subplot(nrows, ncols, index, **kwargs) https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplot.html)
 			plt.subplot(111)
@@ -59,7 +62,7 @@ def main():
 			plt.legend(loc=0, bbox_to_anchor=(SUBPLOTHORIZONAL, SUBPLOTVERTICAL, SUBPLOTWIDTH, 	SUBPLOTHEIGHT), ncol=COLUMNS, fontsize='small', borderaxespad=0.)
 #Save the figure to a png
 			FIG.figure.savefig(PREFIX + '_' + str(SUBPLOTHORIZONAL) + '_' +  str(SUBPLOTVERTICAL) + '_' +  str(SUBPLOTWIDTH) + '_' +  str(SUBPLOTHEIGHT) + '.png')
-		
+			FIG.figure.savefig(PREFIX + '_' + str(SUBPLOTHORIZONAL) + '_' +  str(SUBPLOTVERTICAL) + '_' +  str(SUBPLOTWIDTH) + '_' +  str(SUBPLOTHEIGHT) + '.avg', format='svg')		
 	else:
 		INPUTFRAME = pd.read_table(INPUT, sep = '\t', index_col=0)
 		INPUTFRAME = INPUTFRAME.transpose()
@@ -67,20 +70,23 @@ def main():
 		if LEGEND == 'n' and ORIENT == 'v':
 			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_vertical_nolegend.png')
+			FIG.figure.savefig(PREFIX + '_vertical_nolegend.svg', format='svg')
 		elif LEGEND == 'n' and ORIENT == 'h':
 			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.png')
+			FIG.figure.savefig(PREFIX + '_horizontal_nolegend.svg', format='svg')
 		elif LEGEND == 'y' and ORIENT == 'v':
 			plt.subplot(111) 
 			FIG = INPUTFRAME.plot.bar(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
 			FIG.figure.savefig(PREFIX + '_standard_vertical_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+			FIG.figure.savefig(PREFIX + '_standard_vertical_plot' + '.svg', bbox_extra_artists=(lgd,), bbox_inches='tight', format='svg')
 		else:
 			plt.subplot(111) 
 			FIG = INPUTFRAME.plot.barh(stacked=True, width=SPACE, legend=False)
 			lgd = plt.legend(loc=2, bbox_to_anchor=(1.01, 1), ncol=COLUMNS, borderaxespad=0.)
 			FIG.figure.savefig(PREFIX + '_standard_horizontal_plot' + '.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
-			
+			FIG.figure.savefig(PREFIX + '_standard_horizontal_plot' + '.svg', bbox_extra_artists=(lgd,), bbox_inches='tight', format='svg')			
 
 ##Get arguments function
 def get_args():
