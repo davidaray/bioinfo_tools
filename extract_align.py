@@ -25,6 +25,7 @@ def get_args():
 	parser.add_argument('-rb', '--rightbuffer', type=int, help='Right beffer size. The number of bp of flanking sequence for each hit to be extracted along with the hit. Optional, Default = 1000', default = 1000)
 	parser.add_argument('-n', '--hitnumber', type=int, help='The number of hits to be exracted. Optional. Default = 50.', default = 50)
 	parser.add_argument('-a', '--align', type=str, help='Align the output fasta file, y or n?. Default is y.', default = 'y')
+	parser.add_argument('-t', '--trimal', type=str, help='Use trimal to remove low-aligning regions, y or n? Trimal can sometimes encounter an error that prevents it from working, this results in an empty file in downstream analyses. Default is y.', default = 'y')
 	parser.add_argument('-e', '--emboss', type=str, help='Generate a trimal/emboss consensus, y or n. Optional.', default = 'y')
 	parser.add_argument("-log", "--log_level", default="INFO")
 
@@ -36,10 +37,11 @@ def get_args():
 	RBUFFER = args.rightbuffer
 	HITNUM = args.hitnumber
 	ALIGN = args.align
+	TRIMAL = args.trimal
 	EMBOSS = args.emboss
 	LOG = args.log_level
 
-	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, EMBOSS, LOG
+	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, LOG
 
 ## Create TE outfiles function. Creates files for populating with blast hits.
 def CREATE_TE_OUTFILES(LIBRARY):
@@ -92,9 +94,14 @@ def MUSCLE(TOALIGN):
 def CONSENSUSGEN(ALIGNED):
 	FILEPREFIX = os.path.splitext(ALIGNED)[0] 
 	SOFTWARE = '/lustre/work/daray/software/'
-	subprocess.run(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
-	subprocess.run(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + FILEPREFIX + '_trimal.fa -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
-	subprocess.run('cat {} {} >{}'.format('muscle/' + FILEPREFIX + '_trimal.fa', 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
+	if TRIMAL == 'y':
+		subprocess.run(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
+		subprocess.run(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + FILEPREFIX + '_trimal.fa -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
+		subprocess.run('cat {} {} >{}'.format('muscle/' + FILEPREFIX + '_trimal.fa', 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
+	if TRIMAL == 'n':
+#		subprocess.run(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
+		subprocess.run(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + ALIGNED + ' -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
+		subprocess.run('cat {} {} >{}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
 
 def DIRS(DIR):
 	if os.path.exists(DIR):
@@ -104,7 +111,7 @@ def DIRS(DIR):
 ####MAIN function
 def main():	
 ##Get input arguments
-	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, EMBOSS, LOG = get_args()
+	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, LOG = get_args()
 
 # Setup logging and script timing
 	handlers = [logging.FileHandler('extract_align.log'), logging.StreamHandler()]
@@ -122,7 +129,8 @@ def main():
 	LOGGER.info('Right buffer size: ' + str(RBUFFER))
 	LOGGER.info('Number of hits evaluated: ' + str(HITNUM))
 	LOGGER.info('Muscle alignment = ' + ALIGN)
-	LOGGER.info('Trimal/Emboss consensus = ' + EMBOSS)
+	LOGGER.info('Trimal processing = ' + TRIMAL)
+	LOGGER.info('Emboss consensus = ' + EMBOSS)
 	LOGGER.info('Log level: ' + LOG)
 
 ## Index the genome 
