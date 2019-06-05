@@ -413,27 +413,14 @@ def main(*args):
     parser.add_argument('-h', '--help', action=_CustomUsageAction )
     parser.add_argument("-l", "--log_level", default="INFO")
     parser.add_argument('-d', '--out_dir')
-    parser.add_argument('-r', '--split')
-    parser.add_argument('-p', '--out_prefix')
-    parser.add_argument('-m', '--min_length')
-    parser.add_argument('-t', '--min_hit_num')
-    parser.add_argument('-c', '--max_divergence')
-    parser.add_argument('-e', '--min_divergence')
-    parser.add_argument('-s', '--sort_criterion')
-    parser.add_argument("-o", "--ovlp_resolution")
-    # Examples:
-    #   e.g. -f 3
-    #     parser.add_argument('-f','--foo', type=int, default=42, help='FOO!')
-    #   e.g. -f   : If set store True in args.foo
-    #     parser.add_argument('-f','--foo', action='store_true')
-    #   e.g. Set the -foo parameter as required
-    #     parser.add_argument('-f','--foo', type=int, required=True )
-    #   e.g. Set the args.foobar using the parameter passed with -foo
-    #     parser.add_argument('-f','--foo', dest='foobar', type=int )
-    #   e.g. Mutual exclusivity
-    #     action = parser.add_mutually_exclusive_group(required=True)
-    #     action.add_argument(...)
-    #
+    parser.add_argument('-sp', '--split', type=str, help='Split into files based on name, family, class? This is optional.')
+    parser.add_argument('-p', '--out_prefix', type=str, help='Prefix to use for output file - default is first field of input filename')
+    parser.add_argument('-m', '--min_length', type=int, help='Minimum size of hit to include in sorted file')
+    parser.add_argument('-n', '--min_hit_num', type=int, help='Minimum number of hits in file before being created. Only implemented if --split option is invoked. Optional.')
+    parser.add_argument('-dmax', '--max_divergence', type=float, help='Maximum divergence allowed in output file.')
+    parser.add_argument('-dmin', '--min_divergence', type=float, help='Minimum divergence allowed in output file.')
+    parser.add_argument('-s', '--sort_criterion', type=str, help='Sort criterion, i.e. size, name, family, class, size, or divergence (diverge), etc.')
+    parser.add_argument("-o", "--ovlp_resolution", type=str, help='Options are higher_score, longer_element, and lower_divergence. Optional')
 
     args = parser.parse_args()
 
