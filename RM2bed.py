@@ -640,7 +640,7 @@ def main(*args):
     # provide some useful filtering functionality
     annot_dataframe = pd.DataFrame(results, columns=['score',
         'pct_mismatches', 'pct_deletions', 'pct_insertions', 'chrom', 'start',
-        'stop', 'score', 'strand', 'family', 'class', 'subclass', 'unused1',
+        'stop', 'rem', 'strand', 'family', 'class', 'subclass', 'unused1',
         'unused2', 'unused3', 'linkage_id', 'diverge'])
 
     if ( args.ovlp_resolution ):
