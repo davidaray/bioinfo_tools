@@ -137,7 +137,7 @@ def main():
 	LOGGER.info('Indexing the genome')
 	GENOMEIDX = Fasta(GENOMEFA)
 	GENOMEPREFIX = os.path.splitext(GENOMEFA)[0]
-	FAIDX = pd.read_table(GENOMEFA + '.fai', sep='\t', names=['one', 'two', 'three', 'four', 'five'])
+	FAIDX = pd.read_csv(GENOMEFA + '.fai', sep='\t', names=['one', 'two', 'three', 'four', 'five'])
 	FAIDX = FAIDX[['one', 'two']]
 	FAIDX.to_csv(GENOMEPREFIX + '.fai', sep='\t', header=False, index=False)
 		
