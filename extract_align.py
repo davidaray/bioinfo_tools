@@ -55,7 +55,7 @@ def CREATE_TE_OUTFILES(LIBRARY):
 ## Organize blast hits function. Will read in blast file, sort based on e-value and bitscore, deterine top BUFFER hits for extraction, extract, and combine with TE file from previous function.
 def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 ##Read in blast data
-	BLASTDF = pd.read_table(BLAST, sep='\t', names=['QUERYNAME', 'SCAFFOLD', 'C', 'D', 'E', 'F', 'QUERYSTART', 'QUERYSTOP', 'SCAFSTART', 'SCAFSTOP', 'E-VALUE', 'BITSCORE'])
+	BLASTDF = pd.read_csv(BLAST, sep='\t', names=['QUERYNAME', 'SCAFFOLD', 'C', 'D', 'E', 'F', 'QUERYSTART', 'QUERYSTOP', 'SCAFSTART', 'SCAFSTOP', 'E-VALUE', 'BITSCORE'])
 ##Convert to bed format
 	BLASTBED = BLASTDF[['SCAFFOLD', 'SCAFSTART', 'SCAFSTOP', 'QUERYNAME', 'E-VALUE', 'BITSCORE']]
 	BLASTBED.insert(5, 'STRAND', '+')
@@ -91,7 +91,7 @@ def MUSCLE(TOALIGN):
 	subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {}'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
 
 ##Consensus generation function
-def CONSENSUSGEN(ALIGNED):
+def CONSENSUSGEN(ALIGNED, TRIMAL):
 	FILEPREFIX = os.path.splitext(ALIGNED)[0] 
 	SOFTWARE = '/lustre/work/daray/software/'
 	if TRIMAL == 'y':
@@ -181,7 +181,7 @@ def main():
 ##Generate new consensus with emboss if flagged
 	if EMBOSS == 'y':
 		for FILE in os.listdir('muscle'):
-			CONSENSUSGEN(FILE)
+			CONSENSUSGEN(FILE, TRIMAL)
 			
 ##Remove empty tmp directories and unneeded files
 	LOGGER.info('Removing tmp directories and extraneous files')
