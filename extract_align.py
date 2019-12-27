@@ -91,7 +91,7 @@ def MUSCLE(TOALIGN):
 	subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {}'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
 
 ##Consensus generation function
-def CONSENSUSGEN(ALIGNED):
+def CONSENSUSGEN(ALIGNED, TRIMAL):
 	FILEPREFIX = os.path.splitext(ALIGNED)[0] 
 	SOFTWARE = '/lustre/work/daray/software/'
 	if TRIMAL == 'y':
@@ -174,14 +174,14 @@ def main():
 	if ALIGN == 'y':
 		COUNTER = 1
 		for FILE in os.listdir('tmpextracts'):
-			LOGGER.info('Aligning TE: ' + str(COUNTER))
+			LOGGER.info('Aligning TE: ' + str(COUNTER) + ': ' + FILE)
 			MUSCLE(FILE)
 			COUNTER = COUNTER + 1
 
 ##Generate new consensus with emboss if flagged
 	if EMBOSS == 'y':
 		for FILE in os.listdir('muscle'):
-			CONSENSUSGEN(FILE)
+			CONSENSUSGEN(FILE, TRIMAL)
 			
 ##Remove empty tmp directories and unneeded files
 	LOGGER.info('Removing tmp directories and extraneous files')
