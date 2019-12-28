@@ -174,7 +174,7 @@ def main():
 	if ALIGN == 'y':
 		COUNTER = 1
 		for FILE in os.listdir('tmpextracts'):
-			LOGGER.info('Aligning TE: ' + str(COUNTER) + ': ' + FILE)
+			LOGGER.info('Aligning TE ' + str(COUNTER) + ': ' + FILE)
 			MUSCLE(FILE)
 			COUNTER = COUNTER + 1
 
