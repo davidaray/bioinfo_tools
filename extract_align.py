@@ -88,7 +88,7 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 def MUSCLE(TOALIGN):
 	TOALIGNPREFIX = os.path.splitext(TOALIGN)[0]
 	SOFTWARE = '/lustre/work/daray/software/'
-	subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {}'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
+	subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {} -maxiters 2'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
 
 ##Consensus generation function
 def CONSENSUSGEN(ALIGNED, TRIMAL):
