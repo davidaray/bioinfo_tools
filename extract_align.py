@@ -27,6 +27,7 @@ def get_args():
 	parser.add_argument('-a', '--align', type=str, help='Align the output fasta file, y or n?. Default is y.', default = 'y')
 	parser.add_argument('-t', '--trimal', type=str, help='Use trimal to remove low-aligning regions, y or n? Trimal can sometimes encounter an error that prevents it from working, this results in an empty file in downstream analyses. Default is y.', default = 'y')
 	parser.add_argument('-e', '--emboss', type=str, help='Generate a trimal/emboss consensus, y or n. Optional.', default = 'y')
+	parser.add_argument('-m', '--maxiters2', type=str, help='Limit muscle iterations to 2? y or n. Optional.', default = 'n')
 	parser.add_argument("-log", "--log_level", default="INFO")
 
 	args = parser.parse_args()
@@ -39,9 +40,10 @@ def get_args():
 	ALIGN = args.align
 	TRIMAL = args.trimal
 	EMBOSS = args.emboss
+	MAXITERS = args.maxiters2
 	LOG = args.log_level
 
-	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, LOG
+	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG
 
 ## Create TE outfiles function. Creates files for populating with blast hits.
 def CREATE_TE_OUTFILES(LIBRARY):
@@ -85,10 +87,13 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 #		COUNTER = COUNTER + 1
 		
 ##Alignment function
-def MUSCLE(TOALIGN):
+def MUSCLE(TOALIGN, MAXITERS):
 	TOALIGNPREFIX = os.path.splitext(TOALIGN)[0]
 	SOFTWARE = '/lustre/work/daray/software/'
-	subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {}'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
+	if MAXITERS == 'y':
+		subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {} -maxiters 2'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
+	else:
+		subprocess.check_call(SOFTWARE + 'muscle/muscle -in {} -out {}'.format('catTEfiles/' + TOALIGN, 'muscle/' + TOALIGNPREFIX + '.fa'), shell=True)
 
 ##Consensus generation function
 def CONSENSUSGEN(ALIGNED, TRIMAL):
@@ -175,7 +180,7 @@ def main():
 		COUNTER = 1
 		for FILE in os.listdir('tmpextracts'):
 			LOGGER.info('Aligning TE: ' + str(COUNTER))
-			MUSCLE(FILE)
+			MUSCLE(FILE, MAXITERS)
 			COUNTER = COUNTER + 1
 
 ##Generate new consensus with emboss if flagged
