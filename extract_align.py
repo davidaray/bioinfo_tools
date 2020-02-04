@@ -80,10 +80,10 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 		SLOPBED = CURRENTBED.slop(g=GENOMEPREFIX + '.fai', l=LBUFFER, r=RBUFFER, output='tmpbedfiles/' + QUERY + '.slop')
 		SLOPBED = BedTool('tmpbedfiles/' + QUERY + '.slop')
 		FASTA = SLOPBED.sequence(fi=GENOME, s=True)
-		FASTASAVE = SLOPBED.save_seqs('tmpextracts/' + QUERY + '.fa')
+		FASTASAVE = SLOPBED.save_seqs('extracts/' + QUERY + '.fa')
 		os.remove('tmpbedfiles/' +  QUERY + '.slop')
 		os.remove('tmpbedfiles/' + QUERY + '.bed')
-		subprocess.run('cat {} {} >{}'.format('tmpextracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
+		subprocess.run('cat {} {} >{}'.format('extracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
 #		COUNTER = COUNTER + 1
 		
 ##Alignment function
@@ -154,7 +154,7 @@ def main():
 		DIRS('muscle')
 	if EMBOSS == 'y':
 		DIRS('consensusfiles')
-	DIRS('tmpextracts')
+	DIRS('extracts')
 	DIRS('catTEfiles')
 	
 ##Determine optional arguments and print to screen.
@@ -178,7 +178,7 @@ def main():
 ##Align extracted hits if flagged
 	if ALIGN == 'y':
 		COUNTER = 1
-		for FILE in os.listdir('tmpextracts'):
+		for FILE in os.listdir('extracts'):
 			LOGGER.info('Aligning TE: ' + str(COUNTER))
 			MUSCLE(FILE, MAXITERS)
 			COUNTER = COUNTER + 1
@@ -191,7 +191,7 @@ def main():
 ##Remove empty tmp directories and unneeded files
 	LOGGER.info('Removing tmp directories and extraneous files')
 	shutil.rmtree('tmpbedfiles/')
-	shutil.rmtree('tmpextracts/')
+#	shutil.rmtree('extracts/')
 	shutil.rmtree('tmpTEfiles/')
 	FILES = [F for F in os.listdir('muscle/') if F.endswith('_cons.fa')]
 	for FILE in FILES:
