@@ -116,7 +116,7 @@ def DIRS(DIR):
 ####MAIN function
 def main():	
 ##Get input arguments
-	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, LOG = get_args()
+	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG = get_args()
 
 # Setup logging and script timing
 	handlers = [logging.FileHandler('extract_align.log'), logging.StreamHandler()]
@@ -193,12 +193,13 @@ def main():
 	shutil.rmtree('tmpbedfiles/')
 #	shutil.rmtree('extracts/')
 	shutil.rmtree('tmpTEfiles/')
-	FILES = [F for F in os.listdir('muscle/') if F.endswith('_cons.fa')]
-	for FILE in FILES:
-		os.remove('muscle/' + FILE)
-	FILES = [F for F in os.listdir('muscle/') if F.endswith('_trimal.fa')]
-	for FILE in FILES:
-		os.remove('muscle/' + FILE)
+	if ALIGN == 'y':
+		FILES = [F for F in os.listdir('muscle/') if F.endswith('_cons.fa')]
+		for FILE in FILES:
+			os.remove('muscle/' + FILE)
+		FILES = [F for F in os.listdir('muscle/') if F.endswith('_trimal.fa')]
+		for FILE in FILES:
+			os.remove('muscle/' + FILE)
 	
 	end_time = time.time()
 	LOGGER.info('Run time: ' + str(datetime.timedelta(seconds=end_time-start_time)))
