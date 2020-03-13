@@ -83,7 +83,7 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 		FASTASAVE = SLOPBED.save_seqs('extracts/' + QUERY + '.fa')
 		os.remove('tmpbedfiles/' +  QUERY + '.slop')
 		os.remove('tmpbedfiles/' + QUERY + '.bed')
-		subprocess.run('cat {} {} >{}'.format('extracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
+		subprocess.call('cat {} {} >{}'.format('extracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
 #		COUNTER = COUNTER + 1
 		
 ##Alignment function
@@ -100,13 +100,13 @@ def CONSENSUSGEN(ALIGNED, TRIMAL):
 	FILEPREFIX = os.path.splitext(ALIGNED)[0] 
 	SOFTWARE = '/lustre/work/daray/software/'
 	if TRIMAL == 'y':
-		subprocess.run(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
-		subprocess.run(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + FILEPREFIX + '_trimal.fa -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
-		subprocess.run('cat {} {} >{}'.format('muscle/' + FILEPREFIX + '_trimal.fa', 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
+		subprocess.call(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
+		subprocess.call(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + FILEPREFIX + '_trimal.fa -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
+		subprocess.call('cat {} {} >{}'.format('muscle/' + FILEPREFIX + '_trimal.fa', 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
 	if TRIMAL == 'n':
-#		subprocess.run(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
-		subprocess.run(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + ALIGNED + ' -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
-		subprocess.run('cat {} {} >{}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
+#		subprocess.call(SOFTWARE + 'trimal/source/trimal -in {} -gt 0.6 -cons 60 -fasta -out {}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_trimal.fa'), shell=True)
+		subprocess.call(SOFTWARE + 'EMBOSS-6.6.0/emboss/cons -sequence muscle/' + ALIGNED + ' -outseq muscle/' + FILEPREFIX + '_cons.fa -name ' + FILEPREFIX + '_cons -plurality 3 -identity 3', shell=True)
+		subprocess.call('cat {} {} >{}'.format('muscle/' + ALIGNED, 'muscle/' + FILEPREFIX + '_cons.fa', 'consensusfiles/' + FILEPREFIX + '_cons.fa'), shell=True)
 
 def DIRS(DIR):
 	if os.path.exists(DIR):
