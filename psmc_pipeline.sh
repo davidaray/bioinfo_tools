@@ -54,7 +54,7 @@ cd $WORKDIR
 # It is recommended to set -d to a third of the average depth and -D to twice.
 
 #If index does not exist, make it usig bowtie2.
-[ ! -f $MAP2".1.bt2" ] && bowtie2-build --threads 36 $ASSEMBLIES/$MAP2.fa $ASSEMBLIES/$MAP2
+[ ! -f $ASSEMBLIES/$MAP2".1.bt2" ] && bowtie2-build --threads 36 $ASSEMBLIES/$MAP2.fa $ASSEMBLIES/$MAP2
 
 #Map the reads to the selected assembly and generate a bam file.
 [ ! -f $PREFIX".bam" ] && bowtie2 --threads 36 -x $ASSEMBLIES/$MAP2 -p 36 -1 $R1 -2 $R2 \
@@ -64,10 +64,7 @@ cd $WORKDIR
 [ ! -f $PREFIX".sort.bam" ] && java -jar $PICARD/picard.jar SortSam I=$PREFIX.bam O=$PREFIX".sort.bam" SORT_ORDER=coordinate
 
 #create a pileup in and map to the genome
-[ ! -f $PREFIX"2"$MAP2".fq.gz" ] && bcftools mpileup --threads 10 -C 50 -f $ASSEMBLIES/$PREFIX.fa $PREFIX".sort.bam" \
-	| bcftools call -c - \
-	| vcfutils.pl vcf2fq -d 7 -D 50 \
-	| gzip > $PREFIX"2"$MAP2".fq.gz"
+[ ! -f $PREFIX"2"$MAP2".fq.gz" ] && bcftools mpileup --threads 36 -C 50 -f $ASSEMBLIES/$MAP2".fa" $PREFIX".sort.bam" | bcftools call -c - | vcfutils.pl vcf2fq -d 7 -D 50 | gzip > $PREFIX"2"$MAP2".fq.gz"
 
 # Convert this fastq file to the input format for PSMC
 [ ! -f $PREFIX"2"$MAP2".psmcfa" ] && $PSMCUTILS/fq2psmcfa $PREFIX"2"$MAP2".fq.gz" > $PREFIX"2"$MAP2".psmcfa"
