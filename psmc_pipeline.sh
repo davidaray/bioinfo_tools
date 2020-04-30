@@ -16,14 +16,18 @@
 ##
 # Input $1 <R1 reads> = fastq.gz containing first set of paired illumina reads for the target species
 # Input $2 <R2 reads> = fastq.gz containing second set of paired illumina reads for the target species
-# Input $3 <Assemblies directory> for mapping> = Path to the genome assemblies required.
-# Input $4 <Assembly for mapping> = Filename of the assembly to which the reads will be mapped. Should # be in <Assemblies directory>.
-# Ex. mMyo.fa
+# Input $3 <Assemblies directory> for mapping> = Path to the genome assemblies required. Ex. 'cPer' for the bat, Carollia perspicillata 
+# Input $4 <Assembly for mapping> = Filename of the assembly to which the reads will be mapped. Should be saved in <Assemblies directory>. Ex. 'cPer.fa' or something similar
 # Input $5 <Prefix> = The prefix you want to use for your output. Ex. mAus for Myotis austroriparius
 # Input $6 <Working directory> = The main working directory for your analyses. Subdirectories 
 # will be created within.
 # 
-# Example - qsub bin/cPer_bat1k_extend_align_svaca.sh assembly/cPer_bat1k.masked.fa.gz /lustre/scratch/daray/test2/cPer repeatmodeler/carollia_short.fa
+# Example -
+# cd <working directory> 
+# qsub psmc_pipeline.sh R1_file.fq R2_file.fq assemblies cPer.fa cPer_psmc .
+# translation = "qsub this script using R1_file.fq, R2_file.fq, with the 
+#                cPer.fa genome assembly in the 'assemblies' 
+#                directory, and using the prefix 'cPer_psmc' for all output files."
 #
 
 R1=$1 #Read1 files
