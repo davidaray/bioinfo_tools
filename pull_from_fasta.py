@@ -6,6 +6,8 @@ import csv
 
 ####################################
 ## Usage: newname_fasta.py -p <filename> -f <fasta file> -o <fasta file>
+## 
+## Pull selected sequences from a larger fasta. Alter headers to blast-friendly format if requested.
 ##
 ## NOTE: make sure there are no trailing end of line characters at the bottom of your pull_list
 ## You will just end up copying the original fasta to a new file if there are.
