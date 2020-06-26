@@ -7,10 +7,13 @@ import csv
 ####################################
 ## Usage: newname_fasta.py -r <filename> -f <fasta file> -n <fasta file>
 ##
+## Replace headers in a large fasta file using a text file that contains original names
+## in the first column and new names in the second. Will find only the headers of interest 
+## and leave any other headers as-is.
 
 def get_args():
 	#What this script does
-	parser = argparse.ArgumentParser(description="Replace headers from TE curation efforts using a text file with original names in the first column and new names in the second.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser = argparse.ArgumentParser(description="Replace headers in a large fasta file using a text file that contains original names in the first column and new names in the second.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	#Argument of the input .clstr file
 	parser.add_argument('-r', '--replace_file', type=str, help='Name of your file with the lists of old and new names.', required=True)
 	#Argument for the taxon list.
