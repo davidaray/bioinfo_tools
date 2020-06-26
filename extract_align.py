@@ -54,7 +54,7 @@ def CREATE_TE_OUTFILES(LIBRARY):
 		record.description = ''
 		SeqIO.write(record, 'tmpTEfiles/' + NEWID + '.fa', 'fasta')
 				
-## Organize blast hits function. Will read in blast file, sort based on e-value and bitscore, deterine top BUFFER hits for extraction, extract, and combine with TE file from previous function.
+## Organize blast hits function. Will read in blast file, sort based on e-value and bitscore, deterine top HITNUM hits for extraction, extract, and combine with TE file from previous function.
 def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 ##Read in blast data
 	BLASTDF = pd.read_csv(BLAST, sep='\t', names=['QUERYNAME', 'SCAFFOLD', 'C', 'D', 'E', 'F', 'QUERYSTART', 'QUERYSTOP', 'SCAFSTART', 'SCAFSTOP', 'E-VALUE', 'BITSCORE'])
