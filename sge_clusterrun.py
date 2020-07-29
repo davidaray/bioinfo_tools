@@ -23,6 +23,7 @@ import errno
 from Bio import SeqIO
 from Bio import SeqRecord
 from Bio import Seq
+import Bio.SeqIO as IO
 
 # Where RepeatMasker is stored
 REPEATMASKER = "/lustre/work/daray/software/RepeatMasker"
@@ -112,12 +113,12 @@ def buildDoLift(GENOME_NAME, OUTDIR, KUE, PROJECT):
 	OUT.write('gzip -f ' + GENOME_NAME + '-landscape.html\n\n')
 	OUT.write('# NOTE NOTE NOTE: Only useful for UCSC\n')
 	OUT.write('# Generate data for the UCSC browser tracks\n')
-	OUT.write('if [[ -f ' + GENOME_NAME + '.fa.out ]] && [[ -f ' + GENOME_NAME + '.fa.align ]]\n')
-	OUT.write('then /lustre/work/daray/software/RepeatMasker/util/rmToUCSCTables.pl -out ' + GENOME_NAME + '.fa.out -align ' + GENOME_NAME + '.fa.align\n')
-	OUT.write('fi\n')
-	OUT.write('  gzip -f ' + GENOME_NAME + '.fa.out.tsv\n')
-	OUT.write('  gzip -f ' + GENOME_NAME + '.fa.align.tsv\n')
-	OUT.write('  gzip -f ' + GENOME_NAME + '.fa.join.tsv\n\n')
+	OUT.write('#if [[ -f ' + GENOME_NAME + '.fa.out ]] && [[ -f ' + GENOME_NAME + '.fa.align ]]\n')
+	OUT.write('#then /lustre/work/daray/software/RepeatMasker/util/rmToUCSCTables.pl -out ' + GENOME_NAME + '.fa.out -align ' + GENOME_NAME + '.fa.align\n')
+	OUT.write('#fi\n')
+	OUT.write('#  gzip -f ' + GENOME_NAME + '.fa.out.tsv\n')
+	OUT.write('#  gzip -f ' + GENOME_NAME + '.fa.align.tsv\n')
+	OUT.write('#  gzip -f ' + GENOME_NAME + '.fa.join.tsv\n\n')
 	OUT.write('# NOTE NOTE NOTE: Only useful to ISB \n')
 	OUT.write('# Generate files for loading into RMDB\n')
 	OUT.write('#cat ' + GENOME_NAME + '.fa.out | /home/rhubley/cAlign > ' + GENOME_NAME + '.fa.out.c\n')
@@ -311,6 +312,9 @@ RECORDS = list(SeqIO.parse(GENOME, "fasta"))
 CHUNK_SIZE = sum(len(i) for i in RECORDS) // BATCH_COUNT + 1
 print('CHUNK_SIZE = ' + str(CHUNK_SIZE))
 
+####Build dictionary from genome index
+RECORD_DICT = IO.to_dict(IO.parse(GENOME_FASTA, "fasta"))
+
 #### Write out the batches as new fasta files============== #### 
 for i, BATCH in enumerate(create_batch(RECORDS, CHUNK_SIZE)):
     #Name the file and keep track of the numbering.
@@ -333,14 +337,13 @@ for i, BATCH in enumerate(create_batch(RECORDS, CHUNK_SIZE)):
 			if LINE.startswith('>'):
 				HEADER = re.sub('>','',LINE)
 				HEADER2 = re.sub('\n','',HEADER)
-				PART1_HEADER = HEADER2.split(":")
-				CONTIG = str(PART1_HEADER[0])
-				PART2_HEADER = PART1_HEADER[1]
-				SPLIT_PART2 = PART2_HEADER.split("-")
-				START = int(SPLIT_PART2[0])
-				END = int(SPLIT_PART2[1])
+				CONTIG = HEADER2.split(":")[0]
+				PART2_HEADER = HEADER2.split(":")[1]
+				START = int(PART2_HEADER.split("-")[0])
+				END = int(PART2_HEADER.split("-")[1])
 				LENGTH = END-START
-				OUTPUT.write(str(START) + '\t' + str(HEADER2) + '\t' + str(LENGTH) + '\t' + str(CONTIG) + '\t' + str(END) + '\n')
+				ORIGINAL_CONTIG_LENGTH = len(RECORD_DICT[str(CONTIG)])
+				OUTPUT.write(str(START) + '\t' + str(HEADER2) + '\t' + str(LENGTH) + '\t' + str(CONTIG) + '\t' + str(ORIGINAL_CONTIG_LENGTH) + '\n')
 	OUTPUT.close()
     #write the batch-***.sh file as well using the same system
 	SH_FILE = "batch-{:03d}.sh".format(i)
