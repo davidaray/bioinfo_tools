@@ -176,7 +176,7 @@ def main():
 	CREATE_TE_OUTFILES(LIB)
 	
 ##Extract hits and combine them with the TE out files if flagged
-	EXTRACT_BLAST_HITS(GENOMEFA, BLAST, LBUFFER, RBUFFER, HITNUM)
+	EXTRACT_BLAST_HITS(GENOMEFA, BLAST, LBUFFER, RBUFFER, HITNUM, BEDS)
 	
 ##Align extracted hits if flagged
 	if ALIGN == 'y':
