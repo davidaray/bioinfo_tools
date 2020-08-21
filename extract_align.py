@@ -26,9 +26,10 @@ def get_args():
 	parser.add_argument('-n', '--hitnumber', type=int, help='The number of hits to be exracted. Optional. Default = 50.', default = 50)
 	parser.add_argument('-a', '--align', type=str, help='Align the output fasta file, y or n?. Default is y.', default = 'y')
 	parser.add_argument('-t', '--trimal', type=str, help='Use trimal to remove low-aligning regions, y or n? Trimal can sometimes encounter an error that prevents it from working, this results in an empty file in downstream analyses. Default is y.', default = 'y')
-	parser.add_argument('-e', '--emboss', type=str, help='Generate a trimal/emboss consensus, y or n. Optional.', default = 'y')
-	parser.add_argument('-m', '--maxiters2', type=str, help='Limit muscle iterations to 2? y or n. Optional.', default = 'n')
-	parser.add_argument("-log", "--log_level", default="INFO")
+	parser.add_argument('-e', '--emboss', type=str, help='Generate a trimal/emboss consensus, y or n. Optional. Default=y.', default = 'y')
+	parser.add_argument('-m', '--maxiters2', type=str, help='Limit muscle iterations to 2? y or n. Optional. Default=n.', default = 'n')
+	parser.add_argument('-log', '--log_level', default='INFO')
+	parser.add_argument('-beds', '--keep_beds', type=str, help='Keep the bed files used for extractions. y or n. Optional. Default=n.', default='n')
 
 	args = parser.parse_args()
 	GENOMEFA = args.genome_fasta
@@ -42,8 +43,9 @@ def get_args():
 	EMBOSS = args.emboss
 	MAXITERS = args.maxiters2
 	LOG = args.log_level
+	BEDS = args.keep_beds
 
-	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG
+	return GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG, BEDS
 
 ## Create TE outfiles function. Creates files for populating with blast hits.
 def CREATE_TE_OUTFILES(LIBRARY):
@@ -116,7 +118,7 @@ def DIRS(DIR):
 ####MAIN function
 def main():	
 ##Get input arguments
-	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG = get_args()
+	GENOMEFA, BLAST, LIB, LBUFFER, RBUFFER, HITNUM, ALIGN, TRIMAL, EMBOSS, MAXITERS, LOG, BEDS = get_args()
 
 # Setup logging and script timing
 	handlers = [logging.FileHandler('extract_align.log'), logging.StreamHandler()]
@@ -190,7 +192,8 @@ def main():
 			
 ##Remove empty tmp directories and unneeded files
 	LOGGER.info('Removing tmp directories and extraneous files')
-	shutil.rmtree('tmpbedfiles/')
+	if BEDS == 'n':
+		shutil.rmtree('tmpbedfiles/')
 #	shutil.rmtree('extracts/')
 	shutil.rmtree('tmpTEfiles/')
 	if ALIGN == 'y':
