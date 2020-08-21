@@ -57,7 +57,7 @@ def CREATE_TE_OUTFILES(LIBRARY):
 		SeqIO.write(record, 'tmpTEfiles/' + NEWID + '.fa', 'fasta')
 				
 ## Organize blast hits function. Will read in blast file, sort based on e-value and bitscore, deterine top HITNUM hits for extraction, extract, and combine with TE file from previous function.
-def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
+def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM, BEDS):
 ##Read in blast data
 	BLASTDF = pd.read_csv(BLAST, sep='\t', names=['QUERYNAME', 'SCAFFOLD', 'C', 'D', 'E', 'F', 'QUERYSTART', 'QUERYSTOP', 'SCAFSTART', 'SCAFSTOP', 'E-VALUE', 'BITSCORE'])
 ##Convert to bed format
@@ -84,7 +84,8 @@ def EXTRACT_BLAST_HITS(GENOME, BLAST, LBUFFER, RBUFFER, HITNUM):
 		FASTA = SLOPBED.sequence(fi=GENOME, s=True)
 		FASTASAVE = SLOPBED.save_seqs('extracts/' + QUERY + '.fa')
 		os.remove('tmpbedfiles/' +  QUERY + '.slop')
-		os.remove('tmpbedfiles/' + QUERY + '.bed')
+		if BEDS == 'n':
+			os.remove('tmpbedfiles/' + QUERY + '.bed')
 		subprocess.call('cat {} {} >{}'.format('extracts/' + QUERY + '.fa', 'tmpTEfiles/' + QUERY +'.fa', 'catTEfiles/' + QUERY +'.fa'), shell=True)
 #		COUNTER = COUNTER + 1
 		
