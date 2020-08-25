@@ -139,6 +139,7 @@ def main():
 	LOGGER.info('Muscle alignment = ' + ALIGN)
 	LOGGER.info('Trimal processing = ' + TRIMAL)
 	LOGGER.info('Emboss consensus = ' + EMBOSS)
+	LOGGER.info('Keep bed files = ' + BEDS)
 	LOGGER.info('Log level: ' + LOG)
 
 ## Index the genome 
