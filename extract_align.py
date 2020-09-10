@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 ## Trimal - http://trimal.cgenomics.org/
 ## EMBOSS - http://emboss.sourceforge.net/
 ## These should be installed in your SOFTWARE directory and tweaks may be needed to the paths in 
-## those the MUSCLE and CONSENSUSGEN functions depending on your installation.
+## the MUSCLE and CONSENSUSGEN functions depending on your installation.
 
 ## Set up input arguments
 def get_args():
