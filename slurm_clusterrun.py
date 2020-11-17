@@ -1,7 +1,7 @@
 #############################################
 # usage: sge_clusterrun.py [-h] -i INPUT [-sp SPECIES] 
-# [-b BATCH_COUNT] -dir GENOME_DIR [-od OUTDIR] [-q 
-# {quanah,hrothgar}] [-lib LIBRARY] [-xsmall] [-nolow] [-s 
+# [-b BATCH_COUNT] -dir GENOME_DIR [-od OUTDIR] 
+# [-lib LIBRARY] [-xsmall] [-nolow] [-s 
 # {q,s}][-p PROCESSORS]
 #
 # Replaces the generateSGEclusterrun perl scripts from Robert Hubley.
