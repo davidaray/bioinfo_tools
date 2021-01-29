@@ -91,6 +91,9 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write( '#SBATCH --mail-user david.a.ray@ttu.edu\n')
 	OUT.write( '\n')
 	OUT.write( 'cd ' + PARTITION_DIR + '\n\n')
+	OUT.write( 'REPEATMASKERPATH=/lustre/work/daray/software/RepeatMasker\n')
+	OUT.write( 'SOFTWARE=/lustre/work/daray/software\n')
+	OUT.write( '\n')
 	OUT.write('for d0 in RMPart/???/\n')
 	OUT.write('  do d0=${d0::-1}')
 	OUT.write('  bNum=$(basename $d0)\n')
@@ -103,7 +106,7 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write('# In some cases the file system delays cause the *.out file not to be available \n')
 	OUT.write('# Give it some time for things to settle down\n')
 	OUT.write('sleep 30\n')
-	OUT.write('export PATH=$PATH:/lustre/work/daray/software')
+	OUT.write('export PATH=$PATH:/lustre/work/daray/software\n')
 	OUT.write('$REPEATMASKERPATH/util/buildSummary.pl -useAbsoluteGenomeSize -genome ' + GENOME_NAME + '.2bit ' + GENOME_NAME + '.fa.out > ' + GENOME_NAME + '.summary\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '.summary\n\n')
 	OUT.write('# Generate RepeatLandscape\n')
@@ -279,7 +282,7 @@ else:
 #Set optional parameters for RepeatMasker run.				
 LIB_OR_SPECIES = ""
 if LIBRARY:
-	LIB_OR_SPECIES = ' -lib ../' + LIBRARY + ' '
+	LIB_OR_SPECIES = ' -lib ' + LIBRARY + ' '
 else:
 	LIB_OR_SPECIES = ' -species ' + SPECIES + ' '
 ADD_PARAMS = str(LIB_OR_SPECIES)
