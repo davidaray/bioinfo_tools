@@ -10,7 +10,7 @@
 
 ###########################3
 ## Usage:
-## This script will run the Centos-7 version of RepeatMasker on nocona. 
+## This script will run the Centos-7 version of RepeatMasker on quanah. 
 ## You will need to replace <NAME> with the genome assembly identifier as appropriate.
 ## DIR may need modifying.
 ## sed "s|DIRPATH|path to your directory|g" template_RM_slurmC8.sh ><new file name>
