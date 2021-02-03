@@ -3,6 +3,7 @@
 #SBATCH --output=%x.%j.out
 #SBATCH --error=%x.%j.err
 #SBATCH --partition=nocona
+#SBATCH --mem-per-cpu=100G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mail-user david.a.ray@ttu.edu
