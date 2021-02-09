@@ -33,7 +33,7 @@ DIR=DIRPATH/$RUNTYPE
 cd $DIR
 
 #Runs a python script RM2bed to generate one complete .bed file and several subfiles subdivided by TE class. Merges overlapping hits based using 'lower_divergence' criterion. 
-[ ! -f ${GENOME}_rm.bed ] python  /home/daray/gitrepositories/bioinfo_tools/RM2bed.py -d . -sp class -p ${GENOME} -o lower_divergence ${GENOME}.fa.align.gz
+[ ! -f ${GENOME}_rm.bed ] && python /home/daray/gitrepositories/bioinfo_tools/RM2bed.py -d . -sp class -p ${GENOME} -o lower_divergence ${GENOME}.fa.align.gz
 
 #Calculate genome size by counting all characters in .masked.fa.gz file that are not on a line begining with >. Assign the value to GENOMESIZE. 
 echo "calculating genome size"
