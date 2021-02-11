@@ -1,12 +1,13 @@
-#$ -V
-#$ -cwd
-#$ -S /bin/bash
-#$ -N <NAME>
-#$ -o $JOB_NAME.o$JOB_ID
-#$ -e $JOB_NAME.e$JOB_ID
-#$ -q omni
-#$ -pe sm 1
-#$ -P quanah
+#!/bin/bash
+#SBATCH --job-name=extend_align
+#SBATCH --output=%x.%j.out
+#SBATCH --error=%x.%j.err
+#SBATCH --partition=nocona
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem-per-cpu=60G
+#SBATCH --mail-user david.a.ray@ttu.edu
+
 
 
 #### BASICS
