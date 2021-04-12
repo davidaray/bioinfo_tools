@@ -26,7 +26,7 @@ from Bio import Seq
 import Bio.SeqIO as IO
 
 # Where RepeatMasker is stored
-REPEATMASKER = "/lustre/work/daray/software/RepeatMasker"
+REPEATMASKER = "/lustre/work/daray/software/RepeatMasker-4.1.2-p1"
 # Where this script can find liftUp, twoBitInfo and twoBitToFa
 BIN_DIR = "/lustre/work/daray/software"
 
@@ -73,7 +73,7 @@ def get_args():
 
 	return GENOME, SPECIES, BATCH_COUNT, GENOME_DIR, OUTDIR, LIBRARY, XSMALL, NOLOW, SPEED, PROC
     
-REPEATMASKERPATH = '/lustre/work/daray/software/RepeatMasker'
+REPEATMASKERPATH = '/lustre/work/daray/software/RepeatMasker-4.1.2-p1'
 SOFTWARE = '/lustre/work/daray/software'
 
 #Function 1: build doLift.sh
@@ -81,6 +81,7 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	PARTITION_DIR=os.getcwd()
 	print("Creating doLift.sh file...\n")
 	OUT = open('doLift.sh', 'w+')
+	OUT.write( '#!/bin/bash\n')
 	OUT.write( '#SBATCH --job-name=' + GENOME_NAME + '.2Bit-doLift\n')
 	OUT.write( '#SBATCH --output=%x.%j.out\n')
 	OUT.write( '#SBATCH --error=%x.%j.err\n')
@@ -90,29 +91,33 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write( '#SBATCH --mail-user david.a.ray@ttu.edu\n')
 	OUT.write( '\n')
 	OUT.write( 'cd ' + PARTITION_DIR + '\n\n')
+	OUT.write( 'REPEATMASKERPATH=/lustre/work/daray/software/RepeatMasker-4.1.2-p1\n')
+	OUT.write( 'SOFTWARE=/lustre/work/daray/software\n')
+	OUT.write( '\n')
 	OUT.write('for d0 in RMPart/???/\n')
 	OUT.write('  do d0=${d0::-1}')
 	OUT.write('  bNum=$(basename $d0)\n')
-	OUT.write('  /lustre/work/daray/software/liftUp -type=.out stdout $d0/$bNum.lft error $d0/$bNum.fa.out > $d0/$bNum.fa.liftedOut\n')
-	OUT.write('  [ -f $d0/$bNum.fa.align ] && /lustre/work/daray/software/liftUp -type=.align stdout $d0/$bNum.lft error $d0/$bNum.fa.align > $d0/$bNum.fa.liftedAlign\n')
+	OUT.write('  /lustre/work/daray/software/ucscTools/liftUp -type=.out stdout $d0/$bNum.lft error $d0/$bNum.fa.out > $d0/$bNum.fa.liftedOut\n')
+	OUT.write('  [ -f $d0/$bNum.fa.align ] && /lustre/work/daray/software/ucscTools/liftUp -type=.align stdout $d0/$bNum.lft error $d0/$bNum.fa.align > $d0/$bNum.fa.liftedAlign\n')
 	OUT.write('done\n\n')
-	OUT.write('/lustre/work/daray/software/liftUp ' + GENOME_NAME + '.fa.out /dev/null carry RMPart/???/*.liftedOut\n')
-	OUT.write('/lustre/work/daray/software/liftUp ' + GENOME_NAME + '.fa.align /dev/null carry RMPart/???/*.liftedAlign\n\n')
+	OUT.write('/lustre/work/daray/software/ucscTools/liftUp ' + GENOME_NAME + '.fa.out /dev/null carry RMPart/???/*.liftedOut\n')
+	OUT.write('/lustre/work/daray/software/ucscTools/liftUp ' + GENOME_NAME + '.fa.align /dev/null carry RMPart/???/*.liftedAlign\n\n')
 	OUT.write('# Create a summary file\n')
 	OUT.write('# In some cases the file system delays cause the *.out file not to be available \n')
 	OUT.write('# Give it some time for things to settle down\n')
 	OUT.write('sleep 30\n')
-	OUT.write('/lustre/work/daray/software/RepeatMasker/util/buildSummary.pl -useAbsoluteGenomeSize -genome ' + GENOME_NAME + '.2bit ' + GENOME_NAME + '.fa.out > ' + GENOME_NAME + '.summary\n')
+	OUT.write('export PATH=$PATH:/lustre/work/daray/software\n')
+	OUT.write('/lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/buildSummary.pl -useAbsoluteGenomeSize -genome ' + GENOME_NAME + '.2bit ' + GENOME_NAME + '.fa.out > ' + GENOME_NAME + '.summary\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '.summary\n\n')
 	OUT.write('# Generate RepeatLandscape\n')
-	OUT.write('perl /lustre/work/daray/software/RepeatMasker/util/calcDivergenceFromAlign.pl -s ' + GENOME_NAME + '.divsum ' + GENOME_NAME + '.fa.align\n')
-	OUT.write('perl /lustre/work/daray/software/RepeatMasker/util/createRepeatLandscape.pl -div ' + GENOME_NAME + '.divsum -twoBit ' + GENOME_NAME + '.2bit > ' + GENOME_NAME + '-landscape.html\n')
+	OUT.write('perl /lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/calcDivergenceFromAlign.pl -s ' + GENOME_NAME + '.divsum ' + GENOME_NAME + '.fa.align\n')
+	OUT.write('perl /lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/createRepeatLandscape.pl -div ' + GENOME_NAME + '.divsum -twoBit ' + GENOME_NAME + '.2bit > ' + GENOME_NAME + '-landscape.html\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '.divsum\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '-landscape.html\n\n')
 	OUT.write('# NOTE NOTE NOTE: Only useful for UCSC\n')
 	OUT.write('# Generate data for the UCSC browser tracks\n')
 	OUT.write('#if [[ -f ' + GENOME_NAME + '.fa.out ]] && [[ -f ' + GENOME_NAME + '.fa.align ]]\n')
-	OUT.write('#then /lustre/work/daray/software/RepeatMasker/util/rmToUCSCTables.pl -out ' + GENOME_NAME + '.fa.out -align ' + GENOME_NAME + '.fa.align\n')
+	OUT.write('#then /lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/rmToUCSCTables.pl -out ' + GENOME_NAME + '.fa.out -align ' + GENOME_NAME + '.fa.align\n')
 	OUT.write('#fi\n')
 	OUT.write('#  gzip -f ' + GENOME_NAME + '.fa.out.tsv\n')
 	OUT.write('#  gzip -f ' + GENOME_NAME + '.fa.align.tsv\n')
@@ -202,7 +207,7 @@ if SPECIES and LIBRARY:
 	sys.exit("Only supply a value for one option: 'species' or 'lib'! Not both!")
 if not os.path.isdir(GENOME_DIR):
 	sys.exit("The given genome directory, '{}', does not exist.".format(GENOME_DIR))
-#Check if library is accessible
+#Check if library is accessible and valid
 if LIBRARY:
 	try:
 		if not os.path.getsize(LIBRARY) > 0:
@@ -210,11 +215,11 @@ if LIBRARY:
 	except OSError as e:
 		sys.exit("The library file '{}' does not exist or is inaccessible.".format(LIBRARY))
 #Check if library is valid
-try:
-	if not os.path.getsize(LIBRARY) > 0:
-		sys.exit("The library file, '{}', is empty.".format(LIBRARY))
-except OSError as e:
-	sys.exit("The library file '{}' does not exist or is inaccessible.".format(LIBRARY))
+#try:
+#	if not os.path.getsize(LIBRARY) > 0:
+#		sys.exit("The library file, '{}', is empty.".format(LIBRARY))
+#except OSError as e:
+#	sys.exit("The library file '{}' does not exist or is inaccessible.".format(LIBRARY))
 
 #Create output directory if it doesn't exist
 if not os.path.isdir(OUTDIR):
@@ -277,7 +282,7 @@ else:
 #Set optional parameters for RepeatMasker run.				
 LIB_OR_SPECIES = ""
 if LIBRARY:
-	LIB_OR_SPECIES = ' -lib ../' + LIBRARY + ' '
+	LIB_OR_SPECIES = ' -lib ' + LIBRARY + ' '
 else:
 	LIB_OR_SPECIES = ' -species ' + SPECIES + ' '
 ADD_PARAMS = str(LIB_OR_SPECIES)
@@ -351,12 +356,13 @@ for i, BATCH in enumerate(create_batch(RECORDS, CHUNK_SIZE)):
 	SLURMBATCH_FILE = os.path.join(PARTITION_DIR, NUM_DIR, SH_FILE)
 	with open(SLURMBATCH_FILE, 'w') as BATCH_FILE, open(QSUB_FILE_PATH, 'a') as QSUB_WRITE:
 		#Write batch file.
+		BATCH_FILE.write( '#!/bin/bash\n')
 		BATCH_FILE.write( '#SBATCH --job-name=' + GENOME_NAME + '.2Bit-doLift\n')
 		BATCH_FILE.write( '#SBATCH --output=%x.%j.out\n')
 		BATCH_FILE.write( '#SBATCH --error=%x.%j.err\n')
 		BATCH_FILE.write( '#SBATCH --partition=nocona\n')
 		BATCH_FILE.write( '#SBATCH --nodes=1\n')
-		BATCH_FILE.write( '#SBATCH --ntasks=1\n')
+		BATCH_FILE.write( '#SBATCH --ntasks=36\n')
 		BATCH_FILE.write( '#SBATCH --mail-user david.a.ray@ttu.edu\n')
 		BATCH_FILE.write( '\n')
 		BATCH_FILE.write('\n')
