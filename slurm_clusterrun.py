@@ -362,7 +362,7 @@ for i, BATCH in enumerate(create_batch(RECORDS, CHUNK_SIZE)):
 		BATCH_FILE.write( '#SBATCH --error=%x.%j.err\n')
 		BATCH_FILE.write( '#SBATCH --partition=nocona\n')
 		BATCH_FILE.write( '#SBATCH --nodes=1\n')
-		BATCH_FILE.write( '#SBATCH --ntasks=36\n')
+		BATCH_FILE.write( '#SBATCH --ntasks=' + PROC + '\n')
 		BATCH_FILE.write( '#SBATCH --mail-user david.a.ray@ttu.edu\n')
 		BATCH_FILE.write( '\n')
 		BATCH_FILE.write('\n')
