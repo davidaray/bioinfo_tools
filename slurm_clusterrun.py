@@ -357,7 +357,7 @@ for i, BATCH in enumerate(create_batch(RECORDS, CHUNK_SIZE)):
 	with open(SLURMBATCH_FILE, 'w') as BATCH_FILE, open(QSUB_FILE_PATH, 'a') as QSUB_WRITE:
 		#Write batch file.
 		BATCH_FILE.write( '#!/bin/bash\n')
-		BATCH_FILE.write( '#SBATCH --job-name=' + GENOME_NAME + '.2Bit-doLift\n')
+		BATCH_FILE.write( '#SBATCH --job-name=' + GENOME_NAME + '.batch.' + NUM_DIR +'\n')
 		BATCH_FILE.write( '#SBATCH --output=%x.%j.out\n')
 		BATCH_FILE.write( '#SBATCH --error=%x.%j.err\n')
 		BATCH_FILE.write( '#SBATCH --partition=nocona\n')
