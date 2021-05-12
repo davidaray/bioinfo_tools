@@ -39,7 +39,7 @@ def main():
     TAXALENGTH = len(TAXA)
 
     for TAXON in TAXA:
-        print('Reading in rm.bed for ' + TAXON + '. Writing out ' + TAXON + '_' + PREFIX +'_processed.bed.')
+        print('Reading in rm.bed for ' + TAXON + '. Writing out ' + TAXON + '_' + PREFIX + '_filtered.bed or ' + TAXON + '_' + PREFIX + '_unfiltered.bed.')
         TAXONMU = GENOMESIZES.at[TAXON, 'mu']
         print('Mutation rate for ' + TAXON + ' = '+ str(TAXONMU))
         TAXONRMBED = pd.read_table(TAXON + '_rm.bed', sep='\t', index_col=False, names=[TAXON + '_chromosome', 'start', 'stop', 'TE', 'size', 'orientation','class', 'family', 'div', 'ID'])
@@ -48,13 +48,13 @@ def main():
         TAXONPROCESSEDBED['age'] = TAXONPROCESSEDBED['age'].div(100)
         TAXONPROCESSEDBED = TAXONPROCESSEDBED.round({'age': 1})
         if AGE:
-            TAXONPROCESSEDBED = TAXONPROCESSEDBED[TAXONPROCESSEDBED['age'] <= AGE]
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
-        if DIV:
-            TAXONPROCESSEDBED = TAXONPROCESSEDBED[TAXONPROCESSEDBED['div'] <= DIV]
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
+            TAXONPROCESSEDBEDAGE = TAXONPROCESSEDBED[TAXONPROCESSEDBED['age'] <= AGE]
+            TAXONPROCESSEDBEDAGE.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
+        elif DIV:
+            TAXONPROCESSEDBEDDIV = TAXONPROCESSEDBED[TAXONPROCESSEDBED['div'] <= DIV]
+            TAXONPROCESSEDBEDDIV.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
         else:
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_unfiltered.bed', sep='\t', index=False)
+            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_unfiltered.bed', sep='\t', index=False) 
 
 ##Get arguments function
 def get_args():
