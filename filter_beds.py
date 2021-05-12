@@ -30,8 +30,8 @@ def main():
 
 #Opens genomesizes.txt as a dictionary. Values taken from RepeatMasker output files 
     print('Reading in genome sizes file.')
-    GENOMESIZES = pd.read_table('test_sizes_mrates.txt', sep='\t', names=['taxon', 'genomesize', 'mu'], squeeze=True, index_col=0)
-    GENOMESIZESFRAME = pd.read_table('test_sizes_mrates.txt', sep='\t', names=['taxon', 'genomesize', 'mu'], squeeze=True)
+    GENOMESIZES = pd.read_table(SIZEFILE, sep='\t', names=['taxon', 'genomesize', 'mu'], squeeze=True, index_col=0)
+    GENOMESIZESFRAME = pd.read_table(SIZEFILE, sep='\t', names=['taxon', 'genomesize', 'mu'], squeeze=True)
 
 #Get taxon list from genome sizes file.
     TAXA = GENOMESIZESFRAME['taxon'].tolist()
