@@ -49,12 +49,12 @@ def main():
         TAXONPROCESSEDBED = TAXONPROCESSEDBED.round({'age': 1})
         if AGE:
             TAXONPROCESSEDBED = TAXONPROCESSEDBED[TAXONPROCESSEDBED['age'] <= AGE]
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_processed.bed', sep='\t', index=False)
+            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
         if DIV:
             TAXONPROCESSEDBED = TAXONPROCESSEDBED[TAXONPROCESSEDBED['div'] <= DIV]
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_processed.bed', sep='\t', index=False)
+            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_filtered.bed', sep='\t', index=False)
         else:
-            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_processed.bed', sep='\t', index=False)
+            TAXONPROCESSEDBED.to_csv(TAXON + '_' + PREFIX +'_unfiltered.bed', sep='\t', index=False)
 
 ##Get arguments function
 def get_args():
