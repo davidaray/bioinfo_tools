@@ -132,6 +132,8 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write('gzip -f ' + GENOME_NAME + '.fa.out\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '.fa.align\n')
 	OUT.write('\n')
+	OUT.write('touch alldone.ok')
+	OUT.write('\n')
 	OUT.close()
 	
 #Function 2: Creating batch files for RepeatMasker runs.
