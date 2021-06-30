@@ -152,7 +152,7 @@ echo "Running extension tool"
 #for every file in the catTEfiles directory
 for FILE in $THISGENOME/extract_align/catTEfiles/*.fa
 	# get the name of the TE being examined from the filename
-	do TEID=$(basename $FILE | awk -F'[.]' '{print $1}')
+	do TEID=$(basename ${FILE::-3})
 	echo "TEID = "$TEID
 	#create a diretory for it if it doesn't already exist
 	[ ! -d $EXTENSIONWORK/$TEID ] && mkdir $EXTENSIONWORK/$TEID		
