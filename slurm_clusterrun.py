@@ -1,5 +1,5 @@
 #############################################
-# usage: sge_clusterrun.py [-h] -i INPUT [-sp SPECIES] 
+# usage: slurm_clusterrun.py [-h] -i INPUT [-sp SPECIES] 
 # [-b BATCH_COUNT] -dir GENOME_DIR [-od OUTDIR] 
 # [-lib LIBRARY] [-xsmall] [-nolow] [-s 
 # {q,s}][-p PROCESSORS]
@@ -113,7 +113,7 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write('perl /lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/calcDivergenceFromAlign.pl -s ' + GENOME_NAME + '.divsum ' + GENOME_NAME + '.fa.align\n')
 	OUT.write('perl /lustre/work/daray/software/RepeatMasker-4.1.2-p1/util/createRepeatLandscape.pl -div ' + GENOME_NAME + '.divsum -twoBit ' + GENOME_NAME + '.2bit > ' + GENOME_NAME + '-landscape.html\n')
 	OUT.write('gzip -f ' + GENOME_NAME + '.divsum\n')
-	OUT.write('gzip -f ' + GENOME_NAME + '-landscape.html\n\n')
+	OUT.write('#gzip -f ' + GENOME_NAME + '-landscape.html\n\n')
 	OUT.write('# NOTE NOTE NOTE: Only useful for UCSC\n')
 	OUT.write('# Generate data for the UCSC browser tracks\n')
 	OUT.write('#if [[ -f ' + GENOME_NAME + '.fa.out ]] && [[ -f ' + GENOME_NAME + '.fa.align ]]\n')
