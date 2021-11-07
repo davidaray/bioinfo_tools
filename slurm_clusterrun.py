@@ -88,6 +88,7 @@ def buildDoLift(GENOME_NAME, OUTDIR):
 	OUT.write( '#SBATCH --partition=nocona\n')
 	OUT.write( '#SBATCH --nodes=1\n')
 	OUT.write( '#SBATCH --ntasks=1\n')
+	OUT.write( '#SBATCH --time=03:00:00\n')
 	OUT.write( '#SBATCH --mail-user david.a.ray@ttu.edu\n')
 	OUT.write( '\n')
 	OUT.write( 'cd ' + PARTITION_DIR + '\n\n')
