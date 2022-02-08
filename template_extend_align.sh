@@ -179,13 +179,13 @@ for FILE in $THISGENOME/extract_align/catTEfiles/*.fa
 	if test $COUNT -lt 10; then cp $TEID"_MSA_extended.fa" $REJECTS; fi
 	if test $COUNT -gt 9; then cp $TEID"_rep.fa" $FINAL_CONSENSUSES; fi
 	#sort possible segmental duplications, >10,000 bp consensus
-	if test $COUNT -gt 9 && test $LENGTH -gt 1000; then cp $TEID".png" $SD; fi 
-	if test $COUNT -gt 9 && test $LENGTH -gt 1000; then cp $TEID"_MSA_extended.fa" $SD; fi 
-	if test $COUNT -gt 9 && test $LENGTH -gt 1000; then cp $TEID"_rep.fa" $SD; fi 	
+	if test $COUNT -gt 9 && test $LENGTH -gt 15000; then cp $TEID".png" $SD; fi 
+	if test $COUNT -gt 9 && test $LENGTH -gt 15000; then cp $TEID"_MSA_extended.fa" $SD; fi 
+	if test $COUNT -gt 9 && test $LENGTH -gt 15000; then cp $TEID"_rep.fa" $SD; fi 	
 	#sort all other possible TEs
-	if test $COUNT -gt 9 && test $LENGTH -lt 10000; then cp $TEID".png" $TE; fi 
-	if test $COUNT -gt 9 && test $LENGTH -lt 10000; then cp $TEID"_MSA_extended.fa" $TE; fi
-	if test $COUNT -gt 9 && test $LENGTH -lt 10000; then cp $TEID"_rep.fa" $TE; fi
+	if test $COUNT -gt 9 && test $LENGTH -lt 15000; then cp $TEID".png" $TE; fi 
+	if test $COUNT -gt 9 && test $LENGTH -lt 15000; then cp $TEID"_MSA_extended.fa" $TE; fi
+	if test $COUNT -gt 9 && test $LENGTH -lt 15000; then cp $TEID"_rep.fa" $TE; fi
 done
 
 
