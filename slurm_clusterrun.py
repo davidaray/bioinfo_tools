@@ -73,7 +73,7 @@ def get_args():
 
 	return GENOME, SPECIES, BATCH_COUNT, GENOME_DIR, OUTDIR, LIBRARY, XSMALL, NOLOW, SPEED, PROC
     
-REPEATMASKERPATH = '/lustre/work/daray/software/RepeatMasker-4.1.2-p1'
+REPEATMASKERPATH = '/lustre/work/daray/software/RepeatMasker'
 SOFTWARE = '/lustre/work/daray/software'
 
 #Function 1: build doLift.sh
