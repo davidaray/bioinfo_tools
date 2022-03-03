@@ -36,18 +36,32 @@ import seaborn as sns
 
 def get_args():
     parser = argparse.ArgumentParser(description="Will generate pie chart and landscape plot along with multiple table files when given repeatmasker.bed files and a genomesize file.")
-    parser.add_argument("-d", "--divergence", required=True, type =  int, help="Please enter your maximum divergence value. Default = 50.", default = 50)
+    parser.add_argument("-d", "--divergence", required=True, type = int, help="Please enter your maximum divergence value. Default = 50.", default = 50)
     parser.add_argument("-g", "--genomesize", required=True, type = str, help="Enter path to genomesizefile. Tab delimited with TaxonName, GenomeSize, MutationRate, and TaxonAbbreviation. For example, Ixodes_scapularis	2226883318	3.39917E-09	iSca. May include multiple lines for each taxon being evaluated.")
+    parser.add_argument("-m", "--minimum100bp", type = str, help="Only count hits that are at least 100 bp long? y or n? Default = y. Optional.", default = 'y')
 
     args = parser.parse_args()
     DIVERGENCE = args.divergence
     SIZEFILE = args.genomesize
+    MIN100 = args.minimum100bp
 
-    return DIVERGENCE, SIZEFILE
+    if MIN100 == 'y':
+        print('minimum100bp entered as y. Not counting hits < 100 bp.')
+    elif MIN100 is None:
+        MIN100 == 'y'
+        print('minimum100bp not entered. Default = y. Not counting hits < 100 bp.')
+    elif MIN100 != 'y' and MIN100 != 'n':
+        MIN100 == 'y'
+        print('minimum100bp intput is not y or n. Value = y. Not counting hits < 100 bp.')
+    elif MIN100 == 'n':
+        MIN100 == 'n'
+        print('minimum100bp input is n. Counting hits < 100 bp.')
+
+    return DIVERGENCE, SIZEFILE, MIN100
 
 ################# Plotting ###################
 
-def plot(SIZEFILE, DIVERGENCE):
+def plot(SIZEFILE, DIVERGENCE, MIN100):
     print('Reading in genome sizes file, ' + SIZEFILE + '.')
     GENOMESIZES = pd.read_table(SIZEFILE, sep='\t', names=['taxon', 'genomesize', 'mu', 'taxon_abbrev'], index_col=0)
     GENOMESIZES = GENOMESIZES.squeeze()
@@ -81,7 +95,8 @@ def plot(SIZEFILE, DIVERGENCE):
         FILE=FILE[FILE['Class'].isin(TETYPES)]
         FILE['Size'] = pd.to_numeric(FILE['Size'])
         FILE['Div'] = pd.to_numeric(FILE['Div'])
-        #FILE=FILE[FILE.Size >= 100]
+        if MIN100 == "y":
+            FILE=FILE[FILE.Size >= 100]
         FILE['Proportion']= FILE['Size']/GENSIZE
         #FILE['Age'] = FILE['Age'].map(lambda x: round(x, -7))
         #AGE_DF = FILE.groupby(["Class", "Age"])[['Proportion']].sum().reset_index()
@@ -171,9 +186,10 @@ def plot(SIZEFILE, DIVERGENCE):
 ########## MAIN function ###########
 def main():	
 ##Get input arguments
-    DIVERGENCE, SIZEFILE = get_args()
+    DIVERGENCE, SIZEFILE, MIN100 = get_args()
+
 ##Start the plotting
-    plot(SIZEFILE, DIVERGENCE)
+    plot(SIZEFILE, DIVERGENCE, MIN100)
 
 if __name__ =="__main__":main()
 
