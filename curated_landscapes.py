@@ -67,9 +67,7 @@ def get_args():
 def plot(SIZEFILE, DIVERGENCE, MIN100):
     print('Reading in genome sizes file, ' + SIZEFILE + '.')
     GENOMESIZES = pd.read_table(SIZEFILE, sep='\t', names=['taxon', 'genomesize', 'mu', 'taxon_abbrev'], index_col=0)
-    GENOMESIZES = GENOMESIZES.squeeze()
     GENOMESIZESFRAME = pd.read_table(SIZEFILE, sep='\t', names=['taxon', 'genomesize', 'mu', 'taxon_abbrev'])
-    GENOMESIZESFRAME = GENOMESIZESFRAME.squeeze()
     TAXA = GENOMESIZESFRAME['taxon'].tolist()
     TAXA.reverse()
     IDS = GENOMESIZESFRAME['taxon_abbrev'].tolist()
