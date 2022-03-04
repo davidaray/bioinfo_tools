@@ -38,25 +38,28 @@ def get_args():
     parser = argparse.ArgumentParser(description="Will generate pie chart and landscape plot along with multiple table files when given repeatmasker.bed files and a genomesize file.")
     parser.add_argument("-d", "--divergence", required=True, type = int, help="Please enter your maximum divergence value. Default = 50.", default = 50)
     parser.add_argument("-g", "--genomesize", required=True, type = str, help="Enter path to genomesizefile. Tab delimited with TaxonName, GenomeSize, MutationRate, and TaxonAbbreviation. For example, Ixodes_scapularis	2226883318	3.39917E-09	iSca. May include multiple lines for each taxon being evaluated.")
-    parser.add_argument("-m", "--minimum100bp", type = str, help="Only count hits that are at least 100 bp long? y or n? Default = y. Optional.", default = 'y')
+#    parser.add_argument("-m", "--minimum100bp", type = str, help="Only count hits that are at least 100 bp long? y or n? Default = y. Optional.", default = 'y')
+    parser.add_argument("-m", "--minimum100bp", action='store_false', help="If entered, count hits that are at under 100 bp long. Otherwise, omit them. Default (not entered) is to omit.")
 
     args = parser.parse_args()
     DIVERGENCE = args.divergence
     SIZEFILE = args.genomesize
     MIN100 = args.minimum100bp
 
-    if MIN100 == 'y':
-        print('minimum100bp entered as y. Not counting hits < 100 bp.')
-    elif MIN100 is None:
-        MIN100 == 'y'
+    if MIN100 is True:
         print('minimum100bp not entered. Default = y. Not counting hits < 100 bp.')
-    elif MIN100 != 'y' and MIN100 != 'n':
-        MIN100 == 'y'
-        print('minimum100bp intput is not y or n. Value = y. Not counting hits < 100 bp.')
-    elif MIN100 == 'n':
-        MIN100 == 'n'
-        print('minimum100bp input is n. Counting hits < 100 bp.')
-
+    else:
+        print('minimum100bp flag entered. Counting hits < 100 bp.')
+#    if MIN100 == 'y':
+#        MIN100 == 'y'
+#        print('minimum100bp entered as y. Not counting hits < 100 bp.')
+#    elif MIN100 == 'n':
+#        MIN100 == 'n'
+#        print('minimum100bp input is n. Counting hits < 100 bp.')
+#    else: 
+#        MIN100 == 'y'
+#        print('minimum100bp intput is not y or n. Value set to y. Not counting hits < 100 bp.')
+    
     return DIVERGENCE, SIZEFILE, MIN100
 
 ################# Plotting ###################
