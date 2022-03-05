@@ -5,7 +5,6 @@
 
 # Command line input: 
 # divergence - Maximum divergence to be plotted. Default = 50.
-# bedfiles - One bed file per taxon named as TaxonAbbreviation_rm.bed
 # genomesizefile - Tab delimited with TaxonName, GenomeSize, MutationRate, and TaxonAbbreviation. For 
 #     example, Ixodes_scapularis	2226883318	3.39917E-09	iSca. May include multiple lines for 
 #     each taxon being evaluated.
