@@ -213,7 +213,8 @@ TELIST="LINE SINE LTR RC DNA NOHIT"
 if [ -f ${NAME}_final_table.txt ] 
 	then rm ${NAME}_final_table.txt
 fi
-printf "%-45s \t %-30s \t %-10s \t %-10s \t %-20s \t %-17s \t %-20s \t %-8s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s\n" "RM_ID" "Short_ID"  "Class" "Family" "Modified_ID" "Consensus_length" "90percent_consensus" "N_ORFS" "ORF1_type" "ORF1_length" "ORF2_type" "ORF2_length"	 "ORF3_type" "ORF3_length" >${NAME}_final_table.txt
+#printf "%-45s \t %-30s \t %-10s \t %-10s \t %-20s \t %-17s \t %-20s \t %-8s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s\n" "RM_ID" "Short_ID"  "Class" "Family" "Modified_ID" "Consensus_length" "90percent_consensus" "N_ORFS" "ORF1_type" "ORF1_length" "ORF2_type" "ORF2_length"	 "ORF3_type" "ORF3_length" >${NAME}_final_table.txt
+echo -e "RM_ID \t Short_ID \t Class \t Family \t Modified_ID \t Consensus_length \t 90percent_consensus \t N_ORFS \t ORF1_type \t ORF1_length \t ORF2_type \t ORF2_length \t ORF3_type \t ORF3_length" >${NAME}_final_table.txt
 for TENAME in $TELIST; do 
 	for FILE in $AIDOUT/$TENAME/*_rep.fa; do 
 		echo "TE-Aid processing "$FILE
