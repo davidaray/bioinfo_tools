@@ -31,6 +31,14 @@
 # Recreate on HPCC at TTU using: conda create --name [name of environment] --[environment file name]
 ## Must define all paths and NAME in the PATHS block below
 
+##### To do:
+# 1. Incorporate tandem repeat finder to identify tandemly repeated Penelopes and LTR elements
+#     common in some genomes. Need to avoid simple repeats but catch longer ones.
+# 2. Incorporate the LTR identification package from Jessica Storer that I used with I. scapularis.
+#     It will automatically find most LTRs and separate them from the internal portions, generating
+#     a file ready to submit to Dfam.   
+
+
 module --ignore-cache load gcc/10.1.0 r/4.0.2
 . ~/conda/etc/profile.d/conda.sh
 conda activate curate
