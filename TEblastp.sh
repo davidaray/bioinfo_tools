@@ -8,7 +8,8 @@
 
 #### usage: sbatch TEblastp.sh
 # Will analyze input from processed input from various programs to analyze and 
-# categorize putative TEs. Output in 
+# categorize putative TEs. Output tables in $WORKDIR/prioritize. Additional output 
+# files in $WORKDIR/te-aid. 
 ## Required prior steps:
 # 1. Submit genome assembly to RepeatModeler analysis --> generate .classified file
 # 2. Submit output from .classified file to RepeatAfterMe (RAM) analysis using 
