@@ -5,6 +5,7 @@
 #SBATCH --partition=nocona
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --mem-per-cpu=60G
 
 #### usage: sbatch TEblastp.sh
 # Will analyze input from processed input from various programs to analyze and 
@@ -45,6 +46,8 @@ conda activate curate
 
 ##### PATHS block
 NAME=iRic2
+MINORF=1000
+
 PFAM=/lustre/work/daray/software/pfam_db
 TARGET=${NAME}_extended_rep.fa.classified
 AIDPATH=/lustre/work/daray/software/TE-Aid
@@ -54,16 +57,17 @@ EXTENSIONSDIR=$WORKDIR/extensions
 AIDOUT=$WORKDIR/te-aid
 mkdir -p $AIDOUT
 mkdir -p $WORKDIR/prioritize
-MINORF=1000
 cd $WORKDIR/prioritize
 
+<<COMMENT
+COMMENT
 #Extract headers and subdivide names for later concatenation.
 #Some hits are missing /Family. Correct for that.
 echo -e "Extract headers and subdivide names for later concatenation.\n"
 echo -e "Some hits are missing /Family. Correct for that."
-grep ">" ../repeatclassifier/$TARGET | sed "s/>//g" | sed "s|#Unknown|#Unknown/Unknown|g" | sed "s|#Satellite|#Satellite/Satellite|g" | sed "s|#LTR |#LTR/Unknown|g" | sed "s|#DNA |#DNA/Unknown|g" | sed "s|#tRNA |#tRNA/Nothing|g" | sed "s|#LINE |#LINE/Unknown|g" | sed "s|#|\\t|g" | sed "s|/|\\t|g" >${NAME}_name_class_family.txt
-grep ">" ../repeatclassifier/$TARGET | sed "s/>//g" | cut -d"#" -f1 >${NAME}_name.txt
-grep ">" ../repeatclassifier/$TARGET | sed "s/>//g" >${NAME}_original_headers.txt
+grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" | sed "s|#Unknown|#Unknown/Unknown|g" | sed "s|#Satellite|#Satellite/Satellite|g" | sed "s|#LTR |#LTR/Unknown|g" | sed "s|#DNA |#DNA/Unknown|g" | sed "s|#tRNA |#tRNA/Nothing|g" | sed "s|#LINE |#LINE/Unknown|g" | sed "s|#|\\t|g" | sed "s|/|\\t|g" >${NAME}_name_class_family.txt
+grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" | cut -d"#" -f1 >${NAME}_name.txt
+grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" >${NAME}_original_headers.txt
 echo -e "Complete.\n"
 
 echo -e "Concatenate table.txt."
@@ -72,9 +76,14 @@ echo -e "Complete.\n"
 
 #Get open reading frames for later blastp search
 echo -e "Get open reading frames for later blastp search."
-getorf ../repeatclassifier/${NAME}_extended_rep.fa.classified ${NAME}_extended_rep_getorf.fa -minsize $MINORF
+if [ ! -f ${NAME}_extended_rep_getorf.fa ]
+	then 
+	getorf ../repeatclassifier/${NAME}_extended_rep.fa.classified ${NAME}_extended_rep_getorf.fa -minsize $MINORF
+fi
 echo -e "Complete.\n"
-	
+#COMMENT
+
+#<<COMMENT
 #Test for presence of TE peptide library. Download if necessary and run blastp.
 echo -e "Test for presence of TE peptide library. Download if necessary and run blastp."
 if [ -e db/RepeatPeps.lib.phr ] 
@@ -89,8 +98,10 @@ if [ -e db/RepeatPeps.lib.phr ]
 	blastp -query ${NAME}_extended_rep_getorf.fa  -db db/RepeatPeps.lib -outfmt 6 -evalue 1e-15 | sort -k1,1 -k12,12nr | sort -u -k1,1 | sed 's/#/--/g' > ${NAME}_extended_rep_blastp.out
 fi
 echo -e "Complete.\n"
+#COMMENT
 
-Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation.
+#<<COMMENT
+#Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation.
 echo -e "Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation."
 cat ${NAME}_name.txt | while read I
   do grep "$I" ${NAME}_extended_rep_blastp.out | cut -d$'\t' -f2,4 | sed "s|--|#|g" | cut -d"#" -f2,3 >rows.tmp
@@ -103,25 +114,28 @@ cat ${NAME}_name.txt | while read I
       uniq rows.tmp >tetype.tmp
       TETYPES=$(tr '\n' ' ' < tetype.tmp)
       echo $COUNT $TETYPES >>${NAME}_typelist.txt
-      rm tetype.tmp
+     rm tetype.tmp
   fi
 done 
 sed -i 's/  */\t/g' ${NAME}_typelist.txt
-Remove temporary files
+#Remove temporary files
 rm tetype.tmp
 rm rows.tmp
 echo -e "Complete.\n"
+#COMMENT
 
+#<<COMMENT
 #Get TE consensus sequence lengths for later concatenation
 echo -e "Get TE consensus sequence lengths for later concatenation."
 seqkit fx2tab --length --name --header-line ../repeatclassifier/${NAME}_extended_rep.fa.classified | cut -d$'\t' -f2 >${NAME}_sizes.txt
 sed -i '1d' ${NAME}_sizes.txt
 echo -e "Complete.\n"
 
-#Build the final table with results.
+#Build the initial table with results.
 echo -e "Build the final table with results."
 paste ${NAME}_original_headers.txt ${NAME}_name_class_family.txt ${NAME}_sizes.txt ${NAME}_typelist.txt > ${NAME}_table.txt
 echo -e "Complete.\n"
+#COMMENT
 
 #Create sorting directories
 echo -e "Create sorting directories."
@@ -130,21 +144,27 @@ for TENAME in $TELIST; do
 	mkdir $AIDOUT/$TENAME
 done
 echo -e "Complete.\n"
-	
+#COMMENT
+
+#<<COMMENT
 #Copy created files to sorting directories.
-TELIST="LINE SINE LTR RC DNA NOHIT"
 echo -e "Copy created files to sorting directories."
 TELIST="LINE SINE LTR RC DNA NOHIT"
 for TENAME in $TELIST; do 
+	echo $TENAME
 	awk '{print $2 "\t" $7}' ${NAME}_table.txt | sed "s|/|\t|g" | grep "$TENAME" > ${NAME}_${TENAME}s.txt
-	cat ${NAME}_${TENAME}s.txt | while read I; do
+	cut -d' ' -f1 ${NAME}_${TENAME}s.txt >${NAME}_${TENAME}s.tmp
+	cat ${NAME}_${TENAME}s.tmp | while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
-		cp $EXTENSIONSDIR/extensionwork/$CONSNAME/${CONSNAME}_rep.fa $AIDOUT/$TENAME
-		cp $EXTENSIONSDIR/extensionwork/$CONSNAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME
-		cp $EXTENSIONSDIR/extensionwork/$CONSNAME/${CONSNAME}.png $AIDOUT/$TENAME
+		CONSNAMESHORT=${CONSNAME::-1}
+		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}_rep.fa $AIDOUT/$TENAME/${CONSNAME}_rep.fa
+		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa
+		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}.png $AIDOUT/$TENAME/${CONSNAME}.png
 	done
 done
+rm ${NAME}_*.tmp
 echo -e "Complete.\n"
+#COMMENT
 
 #Change the header to shortened version
 echo -e "Change the header to shortened version."
@@ -157,7 +177,7 @@ for TENAME in $TELIST; do
 		CLASS=$(echo $I | awk '{print $2}') 
 		FAMILY=$(echo $I | awk '{print $3}') 
 		HEADER=${CONSNAMEMOD}#${CLASS}/${FAMILY}
-		sed "s|$CONSNAME|$HEADER|g" $AIDOUT/$TENAME/${CONSNAME}_rep.fa > $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa
+		sed "s|${CONSNAME::-1}|$HEADER|g" $AIDOUT/$TENAME/${CONSNAME}_rep.fa > $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa
 	done
 done
 cat ${NAME}_NOHITs.txt | while read I; do
@@ -165,7 +185,7 @@ cat ${NAME}_NOHITs.txt | while read I; do
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
 	HEADER=$CONSNAMEMOD"#Unknown/Unknown"
-	sed "s|$CONSNAME|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
+	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done
 echo -e "Complete.\n"
 
@@ -182,8 +202,9 @@ if [ -f no_blastx_hit.txt ]
 	then rm no_blastx_hit.txt
 fi
 for TENAME in $TELIST; do 
-	for FILE in $AIDOUT/$TENAME/*_rep.fa; do 
-		CONSNAME=$(basename $FILE _rep.fa)
+	cat ${NAME}_${TENAME}s.txt | while read I; do
+		CONSNAME=$(echo $I | awk '{print $1}')
+		FILE=$AIDOUT/$TENAME/${CONSNAME}_rep.fa
 		echo "Analyzing " $FILE
 		blastx -query $FILE -db db/RepeatPeps.lib -outfmt 6 -evalue 1e-15 | sort -k1,1 -k12,12nr | sort -u -k1,1 | sed 's/#/--/g' > $AIDOUT/$TENAME/${CONSNAME}_extended_rep_blastx.out
 		if [[ -s $AIDOUT/$TENAME/${CONSNAME}_extended_rep_blastx.out ]]; then
@@ -209,7 +230,7 @@ for TENAME in $TELIST; do
 			fi
 		else
 			echo -e "No blastx hits for "$FILE"\n"
-			echo "No blastx hits for "$FILE >> no_blastx_hit.txt
+			echo $FILE >> ${NAME}_no_blastx_hit_${TENAME}.txt
 			mv $FILE $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}.png $AIDOUT/$TENAME/${CONSNAME}_extended_rep_blastx.out $AIDOUT/check_orientation/$TENAME
 		fi
 	done
@@ -225,10 +246,10 @@ fi
 #printf "%-45s \t %-30s \t %-10s \t %-10s \t %-20s \t %-17s \t %-20s \t %-8s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s\n" "RM_ID" "Short_ID"  "Class" "Family" "Modified_ID" "Consensus_length" "90percent_consensus" "N_ORFS" "ORF1_type" "ORF1_length" "ORF2_type" "ORF2_length"	 "ORF3_type" "ORF3_length" >${NAME}_final_table.txt
 echo -e "RM_ID \t Short_ID \t Class \t Family \t Modified_ID \t Consensus_length \t 90percent_consensus \t N_ORFS \t ORF1_type \t ORF1_length \t ORF2_type \t ORF2_length \t ORF3_type \t ORF3_length" >${NAME}_final_table.txt
 for TENAME in $TELIST; do 
-	for FILE in $AIDOUT/$TENAME/*_rep.fa; do 
+	cat ${NAME}_${TENAME}s.txt | while read I; do
+		CONSNAME=$(echo $I | awk '{print $1}')
+		FILE=$AIDOUT/$TENAME/${CONSNAME}_rep.fa
 		echo "TE-Aid processing "$FILE
-		CONSNAME=$(basename $FILE _rep.fa)
-		echo "TE = "$CONSNAME
 		#Generate reverse complement files for identifying TIRs
 		echo "Generate reverse complement files for identifying TIRs."
 		seqkit seq $FILE -r -p -t DNA >$AIDOUT/$TENAME/${CONSNAME}_rep_rc.fa
@@ -250,11 +271,12 @@ for TENAME in $TELIST; do
 		echo $ROW >> ${NAME}_final_table.txt
 	done	
 done	
-#TELIST="LINE SINE LTR RC DNA"	
+TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
-	for FILE in $AIDOUT/check_orientation/$TENAME/*_rep.fa; do 
+	cat ${NAME}_no_blastx_hit_${TENAME}.txt | while read I; do
+		CONSNAME=$(echo $I | awk '{print $1}')
+		FILE=$AIDOUT/check_orientation/$TENAME${CONSNAME}_rep.fa
 		echo "TE-Aid processing "$FILE
-		CONSNAME=$(basename $FILE _rep.fa)
 		#Generate reverse complement files for identifying TIRs
 		seqkit seq $FILE -r -p -t DNA >$AIDOUT/check_orientation/$TENAME/${CONSNAME}_rep_rc.fa
 		cat $FILE $AIDOUT/check_orientation/$TENAME/${CONSNAME}_rep_rc.fa >$AIDOUT/check_orientation/$TENAME/${CONSNAME}_rep_RC.fa
@@ -269,17 +291,24 @@ for TENAME in $TELIST; do
 		MINCONSSIZE=$(awk "BEGIN { print $CONSSIZE * 0.9 }")
 		BLASTTMP=$AIDOUT/$TENAME/${CONSNAME}_rep.fa.genome.blastn.tmp
 		FULLCOUNT=$(awk -v MINCONSSIZE="$MINCONSSIZE" -v BLASTOUT="$BLASTTMP" '$4 > MINCONSSIZE' $BLASTTMP | wc -l)
-		ONE=
 		ROW=$(grep $CONSNAME ${NAME}_table.txt | awk -v FULLCOUNT="$FULLCOUNT" -v MOD_ID="$MOD_ID" '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t" MOD_ID "\t" $5 "\t" FULLCOUNT "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12}')
 		#Generate final table
-		echo $ROW >> ${NAME}_final_table.txt
+#		echo $ROW >> ${NAME}_final_table.txt
 	done	
 done	
 echo -e "Complete.\n"
 
-
-
-
-
-
-
+#Prepare files for download and manual inspection as necessary
+echo "Prepare files for download and manual inspection as necessary"
+TELIST="LINE SINE LTR RC DNA NOHIT"	
+for TENAME in $TELIST; do 
+	mkdir -p $WORKDIR/fordownload/$TENAME
+	cp $AIDOUT/$TENAME/*.pdf $AIDOUT/$TENAME/*.fa $WORKDIR/fordownload/$TENAME
+	tar -zcf $WORKDIR/fordownload/fordownload_${TENAME}.tgz $WORKDIR/fordownload/$TENAME
+done
+TELIST="LINE SINE LTR RC DNA"	
+for TENAME in $TELIST; do 
+	mkdir -p $WORKDIR/fordownload/$TENAME
+	cp $AIDOUT/check_orientation/$TENAME/*.pdf $AIDOUT/check_orientation/$TENAME/*.fa $WORKDIR/fordownload/check_orientation/$TENAME
+	tar -zcf $WORKDIR/fordownload/fordownload_check_orientation/_${TENAME}.tgz $WORKDIR/fordownload/check_orientation/$TENAME
+done
