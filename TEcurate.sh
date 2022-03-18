@@ -293,7 +293,7 @@ for TENAME in $TELIST; do
 		FULLCOUNT=$(awk -v MINCONSSIZE="$MINCONSSIZE" -v BLASTOUT="$BLASTTMP" '$4 > MINCONSSIZE' $BLASTTMP | wc -l)
 		ROW=$(grep $CONSNAME ${NAME}_table.txt | awk -v FULLCOUNT="$FULLCOUNT" -v MOD_ID="$MOD_ID" '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t" MOD_ID "\t" $5 "\t" FULLCOUNT "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12}')
 		#Generate final table
-#		echo $ROW >> ${NAME}_final_table.txt
+		echo $ROW >> ${NAME}_final_table.txt
 	done	
 done	
 echo -e "Complete.\n"
