@@ -47,13 +47,14 @@ conda activate curate
 ##### PATHS block
 NAME=<NAME>
 MINORF=500
+MINCOPY=10
+WORKDIR=/lustre/scratch/daray/ixodes/${NAME}
+TARGET=${NAME}_extended_rep.fa.classified
+EXTENSIONSDIR=/lustre/scratch/daray/ixodes/$NAME/extensions
 
 PFAM=/lustre/work/daray/software/pfam_db
-TARGET=${NAME}_rerun.fa.classified
 AIDPATH=/lustre/work/daray/software/TE-Aid
 ASSEMBLIESDIR=/lustre/scratch/daray/ixodes/assemblies
-WORKDIR=/lustre/scratch/daray/ixodes/${NAME}_rerun
-EXTENSIONSDIR=/lustre/scratch/daray/ixodes/iRic1/extensions
 AIDOUT=$WORKDIR/te-aid
 mkdir -p $AIDOUT
 mkdir -p $WORKDIR/prioritize
@@ -192,11 +193,9 @@ echo -e "Complete.\n"
 #Check orientation of ORF-containing hits and reverse complement if necessary
 echo -e "Check orientation of ORF-containing hits and reverse complement if necessary."
 TELIST="LINE SINE LTR RC DNA"	
-mkdir -p $AIDOUT/check_orientation/LINE
-mkdir -p $AIDOUT/check_orientation/SINE
-mkdir -p $AIDOUT/check_orientation/LTR
-mkdir -p $AIDOUT/check_orientation/RC
-mkdir -p $AIDOUT/check_orientation/DNA
+for TENAME in $TELIST
+	mkdir -p $AIDOUT/check_orientation/$TENAME
+done
 #If no_blastx_hit.txt exists, erase it and start over.
 if [ -f no_blastx_hit.txt ] 
 	then rm no_blastx_hit.txt
@@ -298,6 +297,34 @@ for TENAME in $TELIST; do
 done	
 echo -e "Complete.\n"
 
+echo -e "Filtering unidentified hits with fewer than 10 copies >90% of full-length"
+mkdir -p $AIDOUT/fewhits
+sed '1d' ${NAME}_final_table.txt | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < MINCOPY' >${NAME}_filtered_for_low_count.txt
+cat ${NAME}_filtered_for_low_count.txt | while read I; do
+	CONSNAME=$(echo $I | awk '{print $1}')
+	echo "moving " $CONSNAME
+	find $AIDOUT/NOHIT -type f -name "$CONSNAME*" -exec mv {} $AIDOUT/fewhits \;
+done
+echo -e "Complete.\n"
+
+echo -e "Filtering identified hits with fewer zero copies >90% of full-length"
+TELIST="LINE SINE LTR RC DNA"	
+for TENAME in $TELIST
+	mkdir -p $AIDOUT/zerohits/$TENAME
+done
+#Filter the final table
+sed '1d' ${NAME}_final_table.txt | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < 1' >${NAME}_filtered_for_zero_count.txt
+TELIST="LINE SINE LTR RC DNA"	
+#Move the files
+for TENAME in $TELIST; do 
+	cat ${NAME}_filtered_for_zero_count.txt | while read I; do
+		CONSNAME=$(echo $I | awk '{print $1}')
+		echo "moving " $CONSNAME
+		find $AIDOUT/$TENAME -type f -name "$CONSNAME*" -exec mv {} $AIDOUT/zerohits/$TENAME \;
+	done
+done
+echo -e "Complete.\n"
+
 #Prepare files for download and manual inspection as necessary
 echo "Prepare files for download and manual inspection as necessary"
 TELIST="LINE SINE LTR RC DNA NOHIT"	
@@ -308,7 +335,15 @@ for TENAME in $TELIST; do
 done
 TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
-	mkdir -p $WORKDIR/fordownload/$TENAME
+	mkdir $WORKDIR/fordownload/check_orientation/$TENAME
 	cp $AIDOUT/check_orientation/$TENAME/*.pdf $AIDOUT/check_orientation/$TENAME/*.fa $WORKDIR/fordownload/check_orientation/$TENAME
 	tar -zcf $WORKDIR/fordownload/fordownload_check_orientation/_${TENAME}.tgz $WORKDIR/fordownload/check_orientation/$TENAME
 done
+for TENAME in $TELIST; do 
+	mkdir $WORKDIR/fordownload/zerohits/$TENAME
+	cp $AIDOUT/zerohits/$TENAME/*.pdf $AIDOUT/zerohits/$TENAME/* $WORKDIR/fordownload/zerohits/$TENAME
+	tar -zcf $WORKDIR/fordownload/fordownload_zerohits/_${TENAME}.tgz $WORKDIR/fordownload/zerohits/$TENAME
+done
+
+
+
