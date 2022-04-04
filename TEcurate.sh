@@ -32,7 +32,7 @@
 # Recreate on HPCC at TTU using: conda create --name [name of environment] --[environment file name]
 ## Must define all paths and NAME in the PATHS block below
 
-##### To do:
+##### To do?:
 # 1. Incorporate tandem repeat finder to identify tandemly repeated Penelopes and LTR elements
 #     common in some genomes. Need to avoid simple repeats but catch longer ones.
 # 2. Incorporate the LTR identification package from Jessica Storer that I used with I. scapularis.
@@ -60,10 +60,9 @@ mkdir -p $AIDOUT
 mkdir -p $WORKDIR/prioritize
 cd $WORKDIR/prioritize
 
-<<COMMENT
-COMMENT
-#Extract headers and subdivide names for later concatenation.
-#Some hits are missing /Family. Correct for that.
+#<<COMMENT
+##Extract headers and subdivide names for later concatenation.
+##Some hits are missing /Family. Correct for that.
 echo -e "Extract headers and subdivide names for later concatenation.\n"
 echo -e "Some hits are missing /Family. Correct for that."
 grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" | sed "s|#Unknown|#Unknown/Unknown|g" | sed "s|#Satellite|#Satellite/Satellite|g" | sed "s|#LTR |#LTR/Unknown|g" | sed "s|#DNA |#DNA/Unknown|g" | sed "s|#tRNA |#tRNA/Nothing|g" | sed "s|#LINE |#LINE/Unknown|g" | sed "s|#|\\t|g" | sed "s|/|\\t|g" >${NAME}_name_class_family.txt
@@ -75,7 +74,7 @@ echo -e "Concatenate table.txt."
 paste ${NAME}_original_headers.txt ${NAME}_name_class_family.txt > table.txt
 echo -e "Complete.\n"
 
-#Get open reading frames for later blastp search
+##Get open reading frames for later blastp search
 echo -e "Get open reading frames for later blastp search."
 if [ ! -f ${NAME}_extended_rep_getorf.fa ]
 	then 
@@ -85,7 +84,7 @@ echo -e "Complete.\n"
 #COMMENT
 
 #<<COMMENT
-#Test for presence of TE peptide library. Download if necessary and run blastp.
+##Test for presence of TE peptide library. Download if necessary and run blastp.
 echo -e "Test for presence of TE peptide library. Download if necessary and run blastp."
 if [ -e db/RepeatPeps.lib.phr ] 
   then 
@@ -102,7 +101,7 @@ echo -e "Complete.\n"
 #COMMENT
 
 #<<COMMENT
-#Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation.
+##Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation.
 echo -e "Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation."
 cat ${NAME}_name.txt | while read I
   do grep "$I" ${TARGET}_rep_blastp.out | cut -d$'\t' -f2,4 | sed "s|--|#|g" | cut -d"#" -f2,3 >rows.tmp
@@ -119,26 +118,26 @@ cat ${NAME}_name.txt | while read I
   fi
 done 
 sed -i 's/  */\t/g' ${NAME}_typelist.txt
-#Remove temporary files
+##Remove temporary files
 rm tetype.tmp
 rm rows.tmp
 echo -e "Complete.\n"
 #COMMENT
 
 #<<COMMENT
-#Get TE consensus sequence lengths for later concatenation
+##Get TE consensus sequence lengths for later concatenation
 echo -e "Get TE consensus sequence lengths for later concatenation."
 seqkit fx2tab --length --name --header-line ../repeatclassifier/$TARGET | cut -d$'\t' -f2 >${NAME}_sizes.txt
 sed -i '1d' ${NAME}_sizes.txt
 echo -e "Complete.\n"
 
-#Build the initial table with results.
+Build the initial table with results.
 echo -e "Build the final table with results."
 paste ${NAME}_original_headers.txt ${NAME}_name_class_family.txt ${NAME}_sizes.txt ${NAME}_typelist.txt > ${NAME}_table.txt
 echo -e "Complete.\n"
 #COMMENT
 
-#Create sorting directories
+##Create sorting directories
 echo -e "Create sorting directories."
 TELIST="LINE SINE LTR RC DNA NOHIT"
 for TENAME in $TELIST; do 
@@ -148,7 +147,7 @@ echo -e "Complete.\n"
 #COMMENT
 
 #<<COMMENT
-#Copy created files to sorting directories.
+##Copy created files to sorting directories.
 echo -e "Copy created files to sorting directories."
 TELIST="LINE SINE LTR RC DNA NOHIT"
 for TENAME in $TELIST; do 
@@ -167,7 +166,7 @@ rm ${NAME}_*.tmp
 echo -e "Complete.\n"
 #COMMENT
 
-#Change the header to shortened version
+##Change the header to shortened version
 echo -e "Change the header to shortened version."
 TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
@@ -190,13 +189,13 @@ cat ${NAME}_NOHITs.txt | while read I; do
 done
 echo -e "Complete.\n"
 
-#Check orientation of ORF-containing hits and reverse complement if necessary
+##Check orientation of ORF-containing hits and reverse complement if necessary
 echo -e "Check orientation of ORF-containing hits and reverse complement if necessary."
 TELIST="LINE SINE LTR RC DNA"	
-for TENAME in $TELIST
+for TENAME in $TELIST; do
 	mkdir -p $AIDOUT/check_orientation/$TENAME
 done
-#If no_blastx_hit.txt exists, erase it and start over.
+##If no_blastx_hit.txt exists, erase it and start over.
 if [ -f no_blastx_hit.txt ] 
 	then rm no_blastx_hit.txt
 fi
@@ -236,7 +235,7 @@ for TENAME in $TELIST; do
 done
 echo -e "Complete.\n"
 
-#Run TE-Aid on files in each category
+##Run TE-Aid on files in each category
 echo -e "Run TE-Aid on files in each category."
 TELIST="LINE SINE LTR RC DNA NOHIT"	
 if [ -f ${NAME}_final_table.txt ] 
@@ -297,35 +296,38 @@ for TENAME in $TELIST; do
 done	
 echo -e "Complete.\n"
 
+##Filter unidentified hits with fewer than 10 copies >90% of full-length
 echo -e "Filtering unidentified hits with fewer than 10 copies >90% of full-length"
 mkdir -p $AIDOUT/fewhits
-sed '1d' ${NAME}_final_table.txt | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < MINCOPY' >${NAME}_filtered_for_low_count.txt
+sed '1d' ${NAME}_final_table.txt | grep "NOHIT" | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < MINCOPY' >${NAME}_filtered_for_low_count.txt
 cat ${NAME}_filtered_for_low_count.txt | while read I; do
 	CONSNAME=$(echo $I | awk '{print $1}')
 	echo "moving " $CONSNAME
-	find $AIDOUT/NOHIT -type f -name "$CONSNAME*" -exec mv {} $AIDOUT/fewhits \;
+	mv $AIDOUT/NOHIT/${CONSNAME}_MSA_extended.fa $AIDOUT/NOHIT/${CONSNAME}_rep.fa $AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa $AIDOUT/NOHIT/${CONSNAME}_rep_RC.fa $AIDOUT/NOHIT/${CONSNAME}.c2g.pdf $AIDOUT/fewhits
 done
 echo -e "Complete.\n"
 
-echo -e "Filtering identified hits with fewer zero copies >90% of full-length"
+##Filter identified hits with zero copies >90% of full-length
+echo -e "Filtering identified hits with zero copies >90% of full-length"
 TELIST="LINE SINE LTR RC DNA"	
-for TENAME in $TELIST
+for TENAME in $TELIST; do
 	mkdir -p $AIDOUT/zerohits/$TENAME
 done
-#Filter the final table
-sed '1d' ${NAME}_final_table.txt | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < 1' >${NAME}_filtered_for_zero_count.txt
+##Filter the final table
+sed '1d' ${NAME}_final_table.txt | awk '{print $2 "\t" $7 "\t" $9}' | awk -v MINCOPY="$MINCOPY" '$2 < 1' >${NAME}_filtered_for_zero_count.txt
 TELIST="LINE SINE LTR RC DNA"	
 #Move the files
 for TENAME in $TELIST; do 
-	cat ${NAME}_filtered_for_zero_count.txt | while read I; do
+	grep "$TENAME" ${NAME}_filtered_for_zero_count.txt >${NAME}_${TENAME}_filtered_for_zero_count.txt
+	cat ${NAME}_${TENAME}_filtered_for_zero_count.txt | while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		echo "moving " $CONSNAME
-		find $AIDOUT/$TENAME -type f -name "$CONSNAME*" -exec mv {} $AIDOUT/zerohits/$TENAME \;
+		mv $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}_rep.fa $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa $AIDOUT/$TENAME/${CONSNAME}_rep_RC.fa $AIDOUT/$TENAME/${CONSNAME}.c2g.pdf $AIDOUT/zerohits/$TENAME
 	done
 done
 echo -e "Complete.\n"
 
-#Prepare files for download and manual inspection as necessary
+##Prepare files for download and manual inspection as necessary
 echo "Prepare files for download and manual inspection as necessary"
 TELIST="LINE SINE LTR RC DNA NOHIT"	
 for TENAME in $TELIST; do 
@@ -333,17 +335,11 @@ for TENAME in $TELIST; do
 	cp $AIDOUT/$TENAME/*.pdf $AIDOUT/$TENAME/*.fa $WORKDIR/fordownload/$TENAME
 	tar -zcf $WORKDIR/fordownload/fordownload_${TENAME}.tgz $WORKDIR/fordownload/$TENAME
 done
-TELIST="LINE SINE LTR RC DNA"	
-for TENAME in $TELIST; do 
-	mkdir $WORKDIR/fordownload/check_orientation/$TENAME
-	cp $AIDOUT/check_orientation/$TENAME/*.pdf $AIDOUT/check_orientation/$TENAME/*.fa $WORKDIR/fordownload/check_orientation/$TENAME
-	tar -zcf $WORKDIR/fordownload/fordownload_check_orientation/_${TENAME}.tgz $WORKDIR/fordownload/check_orientation/$TENAME
-done
-for TENAME in $TELIST; do 
-	mkdir $WORKDIR/fordownload/zerohits/$TENAME
-	cp $AIDOUT/zerohits/$TENAME/*.pdf $AIDOUT/zerohits/$TENAME/* $WORKDIR/fordownload/zerohits/$TENAME
-	tar -zcf $WORKDIR/fordownload/fordownload_zerohits/_${TENAME}.tgz $WORKDIR/fordownload/zerohits/$TENAME
-done
+cp -r $AIDOUT/check_orientation $WORKDIR/fordownload/check_orientation
+tar -zcf $WORKDIR/fordownload/fordownload_check_orientation.tgz $WORKDIR/fordownload/check_orientation
+cp -r $AIDOUT/zerohits $WORKDIR/fordownload/zerohits	
+tar -zcf $WORKDIR/fordownload/fordownload_zerohits.tgz $WORKDIR/fordownload/zerohits
+
 
 
 
