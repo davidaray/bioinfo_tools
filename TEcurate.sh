@@ -332,7 +332,7 @@ echo "Prepare files for download and manual inspection as necessary"
 TELIST="LINE SINE LTR RC DNA NOHIT"	
 for TENAME in $TELIST; do 
 	mkdir -p $WORKDIR/fordownload/$TENAME
-	cp $AIDOUT/$TENAME/*.pdf $AIDOUT/$TENAME/*.fa $WORKDIR/fordownload/$TENAME
+	cp $AIDOUT/$TENAME/*.pdf $AIDOUT/$TENAME/*.fa $AIDOUT/$TENAME/*self-blast.pairs.txt $WORKDIR/fordownload/$TENAME
 	tar -zcf $WORKDIR/fordownload/fordownload_${TENAME}.tgz $WORKDIR/fordownload/$TENAME
 done
 cp -r $AIDOUT/check_orientation $WORKDIR/fordownload/check_orientation
