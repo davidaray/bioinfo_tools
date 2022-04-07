@@ -184,7 +184,7 @@ cat ${NAME}_NOHITs.txt | while read I; do
 	CONSNAME=$(echo $I | awk '{print $1}')
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
-	HEADER=$CONSNAMEMOD"#Unknown/Unknown"
+	HEADER=${CONSNAMEMOD}#Unknown/Unknown
 	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done
 echo -e "Complete.\n"
