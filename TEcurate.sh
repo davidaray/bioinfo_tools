@@ -339,6 +339,8 @@ cp -r $AIDOUT/check_orientation $WORKDIR/fordownload/check_orientation
 tar -zcf $WORKDIR/fordownload/fordownload_check_orientation.tgz $WORKDIR/fordownload/check_orientation
 cp -r $AIDOUT/zerohits $WORKDIR/fordownload/zerohits	
 tar -zcf $WORKDIR/fordownload/fordownload_zerohits.tgz $WORKDIR/fordownload/zerohits
+cp -r $AIDOUT/fewhits $WORKDIR/fordownload/fewhits
+tar -zcf $WORKDIR/fordownload/fordownload_fewhits.tgs $WORKDIR/fordownload/fewhits
 
 
 
