@@ -340,7 +340,7 @@ tar -zcf $WORKDIR/fordownload/fordownload_check_orientation.tgz $WORKDIR/fordown
 cp -r $AIDOUT/zerohits $WORKDIR/fordownload/zerohits	
 tar -zcf $WORKDIR/fordownload/fordownload_zerohits.tgz $WORKDIR/fordownload/zerohits
 cp -r $AIDOUT/fewhits $WORKDIR/fordownload/fewhits
-tar -zcf $WORKDIR/fordownload/fordownload_fewhits.tgs $WORKDIR/fordownload/fewhits
+tar -zcf $WORKDIR/fordownload/fordownload_fewhits.tgz $WORKDIR/fordownload/fewhits
 
 
 
