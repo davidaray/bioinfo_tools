@@ -68,7 +68,8 @@ echo -e "Some hits are missing /Family. Correct for that."
 grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" | sed "s|#Unknown|#Unknown/Unknown|g" | sed "s|#Satellite|#Satellite/Satellite|g" | sed "s|#LTR |#LTR/Unknown|g" | sed "s|#DNA |#DNA/Unknown|g" | sed "s|#tRNA |#tRNA/Nothing|g" | sed "s|#LINE |#LINE/Unknown|g" | sed "s|#|\\t|g" | sed "s|/|\\t|g" >${NAME}_name_class_family.txt
 grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" | cut -d"#" -f1 >${NAME}_name.txt
 grep ">" ../repeatclassifier/$TARGET | sed "s/#/-#/g" | sed "s/>//g" >${NAME}_original_headers.txt
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 echo -e "Concatenate table.txt."
 paste ${NAME}_original_headers.txt ${NAME}_name_class_family.txt > table.txt
@@ -80,7 +81,8 @@ if [ ! -f ${NAME}_extended_rep_getorf.fa ]
 	then 
 	getorf ../repeatclassifier/$TARGET ${TARGET}_getorf.fa -minsize $MINORF
 fi
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 #COMMENT
 
 #<<COMMENT
@@ -97,7 +99,8 @@ if [ -e db/RepeatPeps.lib.phr ]
     cd ..
 	blastp -query ${TARGET}_getorf.fa  -db db/RepeatPeps.lib -outfmt 6 -evalue 1e-15 | sort -k1,1 -k12,12nr | sort -u -k1,1 | sed 's/#/--/g' > ${TARGET}_rep_blastp.out
 fi
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 #COMMENT
 
 #<<COMMENT
@@ -121,7 +124,8 @@ sed -i 's/  */\t/g' ${NAME}_typelist.txt
 ##Remove temporary files
 rm tetype.tmp
 rm rows.tmp
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 #COMMENT
 
 #<<COMMENT
@@ -129,7 +133,8 @@ echo -e "Complete.\n"
 echo -e "Get TE consensus sequence lengths for later concatenation."
 seqkit fx2tab --length --name --header-line ../repeatclassifier/$TARGET | cut -d$'\t' -f2 >${NAME}_sizes.txt
 sed -i '1d' ${NAME}_sizes.txt
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 Build the initial table with results.
 echo -e "Build the final table with results."
@@ -143,7 +148,8 @@ TELIST="LINE SINE LTR RC DNA NOHIT"
 for TENAME in $TELIST; do 
 	mkdir $AIDOUT/$TENAME
 done
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 #COMMENT
 
 #<<COMMENT
@@ -163,7 +169,8 @@ for TENAME in $TELIST; do
 	done
 done
 rm ${NAME}_*.tmp
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 #COMMENT
 
 ##Change the header to shortened version
@@ -187,7 +194,8 @@ cat ${NAME}_NOHITs.txt | while read I; do
 	HEADER=${CONSNAMEMOD}#Unknown/Unknown
 	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 ##Check orientation of ORF-containing hits and reverse complement if necessary
 echo -e "Check orientation of ORF-containing hits and reverse complement if necessary."
@@ -233,7 +241,8 @@ for TENAME in $TELIST; do
 		fi
 	done
 done
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 ##Run TE-Aid on files in each category
 echo -e "Run TE-Aid on files in each category."
@@ -244,6 +253,7 @@ fi
 #printf "%-45s \t %-30s \t %-10s \t %-10s \t %-20s \t %-17s \t %-20s \t %-8s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s \t %-10s \t %-14s\n" "RM_ID" "Short_ID"  "Class" "Family" "Modified_ID" "Consensus_length" "90percent_consensus" "N_ORFS" "ORF1_type" "ORF1_length" "ORF2_type" "ORF2_length"	 "ORF3_type" "ORF3_length" >${NAME}_final_table.txt
 echo -e "RM_ID \t Short_ID \t Class \t Family \t Modified_ID \t Consensus_length \t 90percent_consensus \t N_ORFS \t ORF1_type \t ORF1_length \t ORF2_type \t ORF2_length \t ORF3_type \t ORF3_length" >${NAME}_final_table.txt
 for TENAME in $TELIST; do 
+	echo "TE-Aid processing of files in "$NAMESFILE
 	cat ${NAME}_${TENAME}s.txt | while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		FILE=$AIDOUT/$TENAME/${CONSNAME}_rep.fa
@@ -271,6 +281,7 @@ for TENAME in $TELIST; do
 done	
 TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
+	echo "TE-Aid processing of files in "$NAMESFILE
 	cat ${NAME}_no_blastx_hit_${TENAME}.txt | while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		FILE=$AIDOUT/check_orientation/$TENAME${CONSNAME}_rep.fa
@@ -294,7 +305,8 @@ for TENAME in $TELIST; do
 		echo $ROW >> ${NAME}_final_table.txt
 	done	
 done	
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 ##Filter unidentified hits with fewer than 10 copies >90% of full-length
 echo -e "Filtering unidentified hits with fewer than 10 copies >90% of full-length"
@@ -305,7 +317,8 @@ cat ${NAME}_filtered_for_low_count.txt | while read I; do
 	echo "moving " $CONSNAME
 	mv $AIDOUT/NOHIT/${CONSNAME}_MSA_extended.fa $AIDOUT/NOHIT/${CONSNAME}_rep.fa $AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa $AIDOUT/NOHIT/${CONSNAME}_rep_RC.fa $AIDOUT/NOHIT/${CONSNAME}.c2g.pdf $AIDOUT/fewhits
 done
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 ##Filter identified hits with zero copies >90% of full-length
 echo -e "Filtering identified hits with zero copies >90% of full-length"
@@ -325,7 +338,8 @@ for TENAME in $TELIST; do
 		mv $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}_rep.fa $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa $AIDOUT/$TENAME/${CONSNAME}_rep_RC.fa $AIDOUT/$TENAME/${CONSNAME}.c2g.pdf $AIDOUT/zerohits/$TENAME
 	done
 done
-echo -e "Complete.\n"
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 ##Prepare files for download and manual inspection as necessary
 echo "Prepare files for download and manual inspection as necessary"
@@ -341,6 +355,8 @@ cp -r $AIDOUT/zerohits $WORKDIR/fordownload/zerohits
 tar -zcf $WORKDIR/fordownload/fordownload_zerohits.tgz $WORKDIR/fordownload/zerohits
 cp -r $AIDOUT/fewhits $WORKDIR/fordownload/fewhits
 tar -zcf $WORKDIR/fordownload/fordownload_fewhits.tgz $WORKDIR/fordownload/fewhits
+DATE=$(date)
+echo -e "Complete $DATE\n" 
 
 
 
