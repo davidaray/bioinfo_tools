@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=60G
 
-#### usage: sbatch TEblastp.sh
+#### usage: sbatch TEcurate.sh
 # Will analyze input from processed input from various programs to analyze and 
 # categorize putative TEs. Output tables in $WORKDIR/prioritize. Additional output 
 # files in $WORKDIR/te-aid. 
@@ -284,7 +284,7 @@ for TENAME in $TELIST; do
 	echo "TE-Aid processing of files in "$NAMESFILE
 	cat ${NAME}_no_blastx_hit_${TENAME}.txt | while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
-		FILE=$AIDOUT/check_orientation/$TENAME${CONSNAME}_rep.fa
+		FILE=$AIDOUT/check_orientation/$TENAME$/{CONSNAME}_rep.fa
 		echo "TE-Aid processing "$FILE
 		#Generate reverse complement files for identifying TIRs
 		seqkit seq $FILE -r -p -t DNA >$AIDOUT/check_orientation/$TENAME/${CONSNAME}_rep_rc.fa
