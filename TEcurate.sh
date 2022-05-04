@@ -106,8 +106,8 @@ echo -e "Complete $DATE\n"
 #<<COMMENT
 ##Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation.
 echo -e "Pull results of blastp, sort by longest hit, convert to columns, and add to growing list for concatenation."
-cat ${NAME}_name.txt | while read I
-  do grep "$I" ${TARGET}_rep_blastp.out | cut -d$'\t' -f2,4 | sed "s|--|#|g" | cut -d"#" -f2,3 >rows.tmp
+while read -r I; do
+  grep "$I" ${TARGET}_rep_blastp.out | cut -d$'\t' -f2,4 | sed "s|--|#|g" | cut -d"#" -f2,3 >rows.tmp
   COUNT=$(wc -l rows.tmp | cut -d" " -f1)
   if (( COUNT == 0 ))
     then 
@@ -119,7 +119,7 @@ cat ${NAME}_name.txt | while read I
       echo $COUNT $TETYPES >>${NAME}_typelist.txt
      rm tetype.tmp
   fi
-done 
+done < ${NAME}_name.txt 
 sed -i 's/  */\t/g' ${NAME}_typelist.txt
 ##Remove temporary files
 rm tetype.tmp
