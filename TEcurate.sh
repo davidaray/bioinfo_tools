@@ -50,7 +50,7 @@ MINORF=500
 MINCOPY=10
 WORKDIR=/lustre/scratch/daray/ixodes/${NAME}
 TARGET=${NAME}_extended_rep.fa.classified
-EXTENSIONSDIR=/lustre/scratch/daray/ixodes/$NAME/extensions
+EXTENSIONSDIR=$WORKDIR/extensions
 
 PFAM=/lustre/work/daray/software/pfam_db
 AIDPATH=/lustre/work/daray/software/TE-Aid
