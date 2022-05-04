@@ -160,13 +160,13 @@ for TENAME in $TELIST; do
 	echo $TENAME
 	awk '{print $2 "\t" $7}' ${NAME}_table.txt | sed "s|/|\t|g" | grep "$TENAME" > ${NAME}_${TENAME}s.txt
 	cut -d' ' -f1 ${NAME}_${TENAME}s.txt >${NAME}_${TENAME}s.tmp
-	cat ${NAME}_${TENAME}s.tmp | while read I; do
+	while read -r I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		CONSNAMESHORT=${CONSNAME::-1}
 		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}_rep.fa $AIDOUT/$TENAME/${CONSNAME}_rep.fa
 		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa
 		cp $EXTENSIONSDIR/extensionwork/${CONSNAMESHORT}/${CONSNAMESHORT}.png $AIDOUT/$TENAME/${CONSNAME}.png
-	done
+	done < ${NAME}_${TENAME}s.tmp
 done
 rm ${NAME}_*.tmp
 DATE=$(date)
@@ -177,7 +177,7 @@ echo -e "Complete $DATE\n"
 echo -e "Change the header to shortened version."
 TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
-	cat ${NAME}_${TENAME}s.txt | while read I; do
+	while read -r I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		CONSNAMEMOD=${CONSNAME/-rnd-/.}
 		CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
@@ -185,15 +185,15 @@ for TENAME in $TELIST; do
 		FAMILY=$(echo $I | awk '{print $3}') 
 		HEADER=${CONSNAMEMOD}#${CLASS}/${FAMILY}
 		sed "s|${CONSNAME::-1}|$HEADER|g" $AIDOUT/$TENAME/${CONSNAME}_rep.fa > $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa
-	done
+	done < ${NAME}_${TENAME}s.txt 
 done
-cat ${NAME}_NOHITs.txt | while read I; do
+while read -r I; do
 	CONSNAME=$(echo $I | awk '{print $1}')
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
 	HEADER=${CONSNAMEMOD}#Unknown/Unknown
 	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
-done
+done < ${NAME}_NOHITs.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
 
@@ -208,7 +208,7 @@ if [ -f no_blastx_hit.txt ]
 	then rm no_blastx_hit.txt
 fi
 for TENAME in $TELIST; do 
-	cat ${NAME}_${TENAME}s.txt | while read I; do
+	while read -r I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		FILE=$AIDOUT/$TENAME/${CONSNAME}_rep.fa
 		echo "Analyzing " $FILE
@@ -239,7 +239,7 @@ for TENAME in $TELIST; do
 			echo $FILE >> ${NAME}_no_blastx_hit_${TENAME}.txt
 			mv $FILE $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}.png $AIDOUT/$TENAME/${CONSNAME}_extended_rep_blastx.out $AIDOUT/check_orientation/$TENAME
 		fi
-	done
+	done < ${NAME}_${TENAME}s.txt 
 done
 DATE=$(date)
 echo -e "Complete $DATE\n" 
@@ -254,7 +254,7 @@ fi
 echo -e "RM_ID \t Short_ID \t Class \t Family \t Modified_ID \t Consensus_length \t 90percent_consensus \t N_ORFS \t ORF1_type \t ORF1_length \t ORF2_type \t ORF2_length \t ORF3_type \t ORF3_length" >${NAME}_final_table.txt
 for TENAME in $TELIST; do 
 	echo "TE-Aid processing of files in "$NAMESFILE
-	cat ${NAME}_${TENAME}s.txt | while read I; do
+	while read -r I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		FILE=$AIDOUT/$TENAME/${CONSNAME}_rep.fa
 		echo "TE-Aid processing "$FILE
@@ -277,12 +277,12 @@ for TENAME in $TELIST; do
 		ROW=$(grep $CONSNAME ${NAME}_table.txt | awk -v FULLCOUNT="$FULLCOUNT" -v MOD_ID="$MOD_ID" '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t" MOD_ID "\t" $5 "\t" FULLCOUNT "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12}')
 		#Generate final table
 		echo $ROW >> ${NAME}_final_table.txt
-	done	
+	done < ${NAME}_${TENAME}s.txt
 done	
 TELIST="LINE SINE LTR RC DNA"	
 for TENAME in $TELIST; do 
 	echo "TE-Aid processing of files in "$NAMESFILE
-	cat ${NAME}_no_blastx_hit_${TENAME}.txt | while read I; do
+	while read -r I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		FILE=$AIDOUT/check_orientation/$TENAME/${CONSNAME}_rep.fa
 		echo "TE-Aid processing "$FILE
@@ -303,7 +303,7 @@ for TENAME in $TELIST; do
 		ROW=$(grep $CONSNAME ${NAME}_table.txt | awk -v FULLCOUNT="$FULLCOUNT" -v MOD_ID="$MOD_ID" '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t" MOD_ID "\t" $5 "\t" FULLCOUNT "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12}')
 		#Generate final table
 		echo $ROW >> ${NAME}_final_table.txt
-	done	
+	done < ${NAME}_no_blastx_hit_${TENAME}.txt
 done	
 DATE=$(date)
 echo -e "Complete $DATE\n" 
@@ -312,11 +312,11 @@ echo -e "Complete $DATE\n"
 echo -e "Filtering unidentified hits with fewer than 10 copies >90% of full-length"
 mkdir -p $AIDOUT/fewhits
 sed '1d' ${NAME}_final_table.txt | grep "NOHIT" | awk '{print $2 "\t" $7}' | awk -v MINCOPY="$MINCOPY" '$2 < MINCOPY' >${NAME}_filtered_for_low_count.txt
-cat ${NAME}_filtered_for_low_count.txt | while read I; do
+while read -r I; do
 	CONSNAME=$(echo $I | awk '{print $1}')
 	echo "moving " $CONSNAME
 	mv $AIDOUT/NOHIT/${CONSNAME}_MSA_extended.fa $AIDOUT/NOHIT/${CONSNAME}_rep.fa $AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa $AIDOUT/NOHIT/${CONSNAME}_rep_RC.fa $AIDOUT/NOHIT/${CONSNAME}.c2g.pdf $AIDOUT/fewhits
-done
+done < ${NAME}_filtered_for_low_count.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
 
@@ -332,11 +332,11 @@ TELIST="LINE SINE LTR RC DNA"
 #Move the files
 for TENAME in $TELIST; do 
 	grep "$TENAME" ${NAME}_filtered_for_zero_count.txt >${NAME}_${TENAME}_filtered_for_zero_count.txt
-	cat ${NAME}_${TENAME}_filtered_for_zero_count.txt | while read I; do
+	while read I; do
 		CONSNAME=$(echo $I | awk '{print $1}')
 		echo "moving " $CONSNAME
 		mv $AIDOUT/$TENAME/${CONSNAME}_MSA_extended.fa $AIDOUT/$TENAME/${CONSNAME}_rep.fa $AIDOUT/$TENAME/${CONSNAME}_rep_mod.fa $AIDOUT/$TENAME/${CONSNAME}_rep_RC.fa $AIDOUT/$TENAME/${CONSNAME}.c2g.pdf $AIDOUT/zerohits/$TENAME
-	done
+	done < ${NAME}_${TENAME}_filtered_for_zero_count.txt 
 done
 DATE=$(date)
 echo -e "Complete $DATE\n" 
