@@ -12,7 +12,9 @@
 # categorize putative TEs. Output tables in $WORKDIR/prioritize. Additional output 
 # files in $WORKDIR/te-aid. 
 ## Required prior steps:
-# 1. Submit genome assembly to RepeatModeler analysis --> generate .classified file
+# 1. Submit genome assembly to RepeatModeler analysis --> generate -families.fa file. 
+#     Post-processing of this file should be to remove all identifying Class/Family info.
+#     cut -d'#' -f1 <NAME>-families.fa ><NAME>-families_mod.fa
 # 2. Submit output from .classified file to RepeatAfterMe (RAM) analysis using 
 #     template_extend_align.sh 
 #     (https://github.com/davidaray/bioinfo_tools/blob/master/template_extend_align.sh). 
@@ -25,6 +27,7 @@
 #     repeatclassifier.sh 
 #     (https://github.com/davidaray/bioinfo_tools/blob/master/repeatclassifer.sh)
 #     Output from this analysis should be in $WORKDIR/repeatclassifier
+#     Output should be called <NAME>i_extended_rep.fa
 ## Required conda environments for this script and for steps above:
 # /home/daray/extend_env.env.txt
 # /home/daray/repeatmodeler.env.txt
