@@ -13,21 +13,22 @@
 # files in $WORKDIR/te-aid. 
 ## Required prior steps:
 # 1. Submit genome assembly to RepeatModeler analysis --> generate -families.fa file. 
+#     Run rmodel.py using rmodel.sh. Both are available in my github repository.
 #     Post-processing of this file should be to remove all identifying Class/Family info.
 #     cut -d'#' -f1 <NAME>-families.fa ><NAME>-families_mod.fa
 # 2. Submit output from .classified file to RepeatAfterMe (RAM) analysis using 
 #     template_extend_align.sh 
 #     (https://github.com/davidaray/bioinfo_tools/blob/master/template_extend_align.sh). 
 #     Output from this should be in the $EXTENSIONSDIR defined below.
-# 3. Submit RAM output to collapse via cd-hit-est with our parameters. 
+# 3. Collapse RAM output via cd-hit-est with our parameters. 
 #     Example cd-hit-est run: cd-hit-est -i ID_newlib_4cdhit.fa -o ID_newlib.cdhit90_sS09 -c 0.90 -d 70 -aS 0.9 -n 9 -M 2200 -l 100
 #     Process ID_newlib.cdhit90_sS09.clstr and ID_newlib.cdhit90_sS09.fa as necessary to
-#     generate a final set of putative consensus sequences --> ID_extended_rep.fa
+#     generate a final set of putative consensus sequences --> <NAME>_extended_rep.fa
 # 4. Submit final set of putative consensus sequences to a new RepeatClassifier analysis using
 #     repeatclassifier.sh 
 #     (https://github.com/davidaray/bioinfo_tools/blob/master/repeatclassifer.sh)
 #     Output from this analysis should be in $WORKDIR/repeatclassifier
-#     Output should be called <NAME>i_extended_rep.fa
+#     Output should be called <NAME>_extended_rep.fa
 ## Required conda environments for this script and for steps above:
 # /home/daray/extend_env.env.txt
 # /home/daray/repeatmodeler.env.txt
@@ -195,7 +196,7 @@ while read -r I; do
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
 	HEADER=${CONSNAMEMOD}#Unknown/Unknown
-	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
+	sed "s|${CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done < ${NAME}_NOHITs.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
