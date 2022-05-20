@@ -1,5 +1,5 @@
 #!/bin/bash 
-#SBATCH --job-name=TEcurate
+#SBATCH --job-name=<NAME>_TEcurate
 #SBATCH --output=%x.%j.out
 #SBATCH --error=%x.%j.err
 #SBATCH --partition=nocona
@@ -52,17 +52,20 @@ conda activate curate
 NAME=<NAME>
 MINORF=500
 MINCOPY=10
-WORKDIR=/lustre/scratch/daray/ixodes/${NAME}
+WORKDIR=/lustre/scratch/daray/covid_bats/${NAME}
 TARGET=${NAME}_extended_rep.fa.classified
 EXTENSIONSDIR=$WORKDIR/extensions
 
 PFAM=/lustre/work/daray/software/pfam_db
 AIDPATH=/lustre/work/daray/software/TE-Aid
-ASSEMBLIESDIR=/lustre/scratch/daray/ixodes/assemblies
+ASSEMBLIESDIR=$WORKDIR/assemblies_dir
 AIDOUT=$WORKDIR/te-aid
 mkdir -p $AIDOUT
 mkdir -p $WORKDIR/prioritize
 cd $WORKDIR/prioritize
+
+
+
 
 #<<COMMENT
 ##Extract headers and subdivide names for later concatenation.
@@ -140,8 +143,9 @@ sed -i '1d' ${NAME}_sizes.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
 
-Build the initial table with results.
+##Build the initial table with results.
 echo -e "Build the final table with results."
+dos2unix ${NAME}_original_headers.txt ${NAME}_name_class_family.txt ${NAME}_sizes.txt ${NAME}_typelist.txt 
 paste ${NAME}_original_headers.txt ${NAME}_name_class_family.txt ${NAME}_sizes.txt ${NAME}_typelist.txt > ${NAME}_table.txt
 echo -e "Complete.\n"
 #COMMENT
@@ -196,7 +200,7 @@ while read -r I; do
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
 	HEADER=${CONSNAMEMOD}#Unknown/Unknown
-	sed "s|${CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
+	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done < ${NAME}_NOHITs.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
