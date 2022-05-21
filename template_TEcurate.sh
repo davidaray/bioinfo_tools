@@ -200,7 +200,7 @@ while read -r I; do
 	CONSNAMEMOD=${CONSNAME/-rnd-/.}
 	CONSNAMEMOD=${CONSNAMEMOD/_family-/.}
 	HEADER=${CONSNAMEMOD}#Unknown/Unknown
-	sed "s|$CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
+	sed "s|${CONSNAME::-1}|$HEADER|g" $AIDOUT/NOHIT/${CONSNAME}_rep.fa >$AIDOUT/NOHIT/${CONSNAME}_rep_mod.fa
 done < ${NAME}_NOHITs.txt
 DATE=$(date)
 echo -e "Complete $DATE\n" 
