@@ -2,7 +2,7 @@
 # usage: slurm_clusterrun.py [-h] -i INPUT [-sp SPECIES] 
 # [-b BATCH_COUNT] -dir GENOME_DIR [-od OUTDIR] 
 # [-lib LIBRARY] [-xsmall] [-nolow] [-s {q,s}]
-# [-p PROCESSORS] [-q {quanah,nocona}
+# [-p PROCESSORS] [-q {quanah,nocona}]
 #
 # Replaces the generateSGEclusterrun perl scripts from Robert Hubley.
 
@@ -191,7 +191,7 @@ def create_batch(RECORDS, CHUNK_SIZE):
 
 ###The main section of the script
 #Get input arguments
-GENOME, SPECIES, BATCH_COUNT, GENOME_DIR, OUTDIR, LIBRARY, XSMALL, NOLOW, SPEED, PROC = get_args()
+GENOME, SPECIES, BATCH_COUNT, GENOME_DIR, OUTDIR, LIBRARY, XSMALL, NOLOW, SPEED, PROC, QUEUE = get_args()
 
 #### Sanity checks======================== ####
 #Announce inputs
