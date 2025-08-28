@@ -298,7 +298,7 @@ if os.path.isfile(QSUB_FILE_PATH):
 		os.remove(QSUB_FILE_PATH)
 	
 #### Set some variables======================== ####
-GENOME_NAME = os.path.basename(GENOME_FASTA).split(".")[0]
+GENOME_NAME = os.path.basename(GENOME_FASTA).split(".fa")[0]
 print('This is the genome_name: ' + GENOME_NAME)
 SLOTS_PER_BATCH = PROC	
 # Create a list of all the seq records inside of the genome
@@ -369,3 +369,4 @@ else:
 	subprocess.run(SOFTWARE + '/faToTwoBit {} {} '.format(GENOME, GENOME_NAME + '.2bit'), shell=True)
 
 buildDoLift(GENOME_NAME, OUTDIR)
+
