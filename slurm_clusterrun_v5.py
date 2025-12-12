@@ -121,7 +121,7 @@ def buildDoLift(GENOME_NAME, OUTDIR, QUEUE, REPEATMASKERPATH):
         OUT.write(f'python $CURATIONDIR/replace_stars_v2.py -d RMPart/ -i {GENOME_NAME}.fa.out.original -o {GENOME_NAME}.fa.raw.out\n\n')
 
         OUT.write('# Process for overlaps\n')
-        OUT.write(f'python $CURATIONDIR/process_repeatmasker_v7.py -i {GENOME_NAME}.fa.raw.out -p {GENOME_NAME} -ot both -ov lower_divergence -t $SLURM_NTASKS --progress-dir progress_files\n\n')
+        OUT.write(f'python $CURATIONDIR/process_repeatmasker_v8.py -i {GENOME_NAME}.fa.raw.out -p {GENOME_NAME} -ot both -ov lower_divergence -t $SLURM_NTASKS --progress-dir progress_files\n\n')
 
         OUT.write('# Build RepeatMasker summary\n')
         OUT.write(f'perl $REPEATMASKERPATH/util/buildSummary.pl -useAbsoluteGenomeSize -genome {GENOME_NAME}.2bit {GENOME_NAME}.out > {GENOME_NAME}.summary\n\n')
@@ -384,3 +384,4 @@ else:
 	subprocess.run(SOFTWARE + '/faToTwoBit {} {} '.format(GENOME, GENOME_NAME + '.2bit'), shell=True)
 
 buildDoLift(GENOME_NAME, OUTDIR, QUEUE, REPEATMASKERPATH)
+
